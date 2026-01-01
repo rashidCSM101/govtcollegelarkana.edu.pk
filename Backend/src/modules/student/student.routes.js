@@ -15,6 +15,7 @@ const leaveController = require('../leave/leave.controller');
 const certificateController = require('../certificate/certificate.controller');
 const feedbackController = require('../feedback/feedback.controller');
 const notificationController = require('../notification/notification.controller');
+const documentController = require('../document/document.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -109,6 +110,12 @@ router.post('/feedback/submit', studentOnly, feedbackController.submitFeedback.b
 // ==================== NOTIFICATION PREFERENCES ROUTES (Student) ====================
 router.get('/notification-preferences', studentOnly, notificationController.getPreferences.bind(notificationController));
 router.put('/notification-preferences', studentOnly, notificationController.updatePreferences.bind(notificationController));
+
+// ==================== DOCUMENT ROUTES (Student) ====================
+router.post('/documents/upload', studentOnly, documentController.uploadMiddleware, documentController.uploadDocument.bind(documentController));
+router.get('/documents', studentOnly, documentController.getStudentDocuments.bind(documentController));
+router.get('/documents/status', studentOnly, documentController.getDocumentStatus.bind(documentController));
+router.get('/documents/download/:id', studentOnly, documentController.downloadDocument.bind(documentController));
 
 // ==================== COURSE SECTIONS ROUTES (Admin) ====================
 router.post('/sections', adminOnly, studentController.createSection);

@@ -6,6 +6,7 @@ const certificateController = require('../certificate/certificate.controller');
 const feedbackController = require('../feedback/feedback.controller');
 const noticeController = require('../notice/notice.controller');
 const notificationController = require('../notification/notification.controller');
+const documentController = require('../document/document.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -132,5 +133,25 @@ router.delete('/notices/:id', noticeController.deleteNotice.bind(noticeControlle
 // ==================== NOTIFICATION PREFERENCES ROUTES (Admin) ====================
 router.get('/notification-preferences', notificationController.getPreferences.bind(notificationController));
 router.put('/notification-preferences', notificationController.updatePreferences.bind(notificationController));
+
+// ==================== DOCUMENT ROUTES (Admin) ====================
+
+// Get pending documents for verification
+router.get('/documents/pending', documentController.getPendingDocuments.bind(documentController));
+
+// Get all documents with filters
+router.get('/documents', documentController.getAllDocuments.bind(documentController));
+
+// Verify document
+router.post('/documents/verify/:id', documentController.verifyDocument.bind(documentController));
+
+// Reject document
+router.post('/documents/reject/:id', documentController.rejectDocument.bind(documentController));
+
+// Download document
+router.get('/documents/download/:id', documentController.downloadDocumentAdmin.bind(documentController));
+
+// Get verification statistics
+router.get('/documents/statistics', documentController.getVerificationStatistics.bind(documentController));
 
 module.exports = router;
