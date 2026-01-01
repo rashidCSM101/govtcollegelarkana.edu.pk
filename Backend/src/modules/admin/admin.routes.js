@@ -7,6 +7,7 @@ const feedbackController = require('../feedback/feedback.controller');
 const noticeController = require('../notice/notice.controller');
 const notificationController = require('../notification/notification.controller');
 const documentController = require('../document/document.controller');
+const scholarshipController = require('../scholarship/scholarship.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -153,5 +154,28 @@ router.get('/documents/download/:id', documentController.downloadDocumentAdmin.b
 
 // Get verification statistics
 router.get('/documents/statistics', documentController.getVerificationStatistics.bind(documentController));
+
+// ==================== SCHOLARSHIP ROUTES (Admin) ====================
+
+// Create scholarship
+router.post('/scholarships', scholarshipController.createScholarship.bind(scholarshipController));
+
+// Get all scholarships
+router.get('/scholarships', scholarshipController.getAllScholarships.bind(scholarshipController));
+
+// Get applications for a scholarship
+router.get('/scholarship/:id/applications', scholarshipController.getScholarshipApplications.bind(scholarshipController));
+
+// Approve application
+router.post('/scholarship/application/:id/approve', scholarshipController.approveApplication.bind(scholarshipController));
+
+// Reject application
+router.post('/scholarship/application/:id/reject', scholarshipController.rejectApplication.bind(scholarshipController));
+
+// Process distribution
+router.post('/scholarship/distribution/:applicationId', scholarshipController.processDistribution.bind(scholarshipController));
+
+// Get statistics
+router.get('/scholarship/statistics', scholarshipController.getStatistics.bind(scholarshipController));
 
 module.exports = router;

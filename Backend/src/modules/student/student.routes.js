@@ -16,6 +16,7 @@ const certificateController = require('../certificate/certificate.controller');
 const feedbackController = require('../feedback/feedback.controller');
 const notificationController = require('../notification/notification.controller');
 const documentController = require('../document/document.controller');
+const scholarshipController = require('../scholarship/scholarship.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -116,6 +117,11 @@ router.post('/documents/upload', studentOnly, documentController.uploadMiddlewar
 router.get('/documents', studentOnly, documentController.getStudentDocuments.bind(documentController));
 router.get('/documents/status', studentOnly, documentController.getDocumentStatus.bind(documentController));
 router.get('/documents/download/:id', studentOnly, documentController.downloadDocument.bind(documentController));
+
+// ==================== SCHOLARSHIP ROUTES (Student) ====================
+router.get('/scholarships', studentOnly, scholarshipController.getAvailableScholarships.bind(scholarshipController));
+router.post('/scholarship/apply', studentOnly, scholarshipController.applyForScholarship.bind(scholarshipController));
+router.get('/scholarship/status', studentOnly, scholarshipController.getApplicationStatus.bind(scholarshipController));
 
 // ==================== COURSE SECTIONS ROUTES (Admin) ====================
 router.post('/sections', adminOnly, studentController.createSection);
