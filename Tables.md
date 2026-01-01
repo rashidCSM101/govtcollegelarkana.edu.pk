@@ -51,8 +51,8 @@
 34. admission_applications (id, application_no, full_name, father_name, mother_name, dob, gender, cnic, phone, email, address, city, province, previous_qualification, obtained_marks, total_marks, percentage, program_id, photo_path, documents, status, merit_score, merit_position, application_date, reviewed_by, approved_by, admission_date)
 
 -- Assignments
-35. assignments (id, course_id, section_id, title, description, total_marks, due_date, file_path, created_by, created_at)
-36. assignment_submissions (id, assignment_id, student_id, submission_text, file_path, submitted_at, marks_obtained, graded_by, graded_at, feedback)
+35. assignments (id, course_id, section_id, title, description, instructions, total_marks, due_date, file_path, allow_multiple_submissions, allow_late_submissions, late_penalty_per_day, created_by, created_at)
+36. assignment_submissions (id, assignment_id, student_id, submission_text, file_path, submitted_at, marks_obtained, graded_by, graded_at, feedback, status)
 
 -- Leave Management
 37. leave_applications (id, student_id, leave_type, from_date, to_date, reason, document_path, application_date, status, approved_by, approved_at, remarks)

@@ -607,9 +607,13 @@ const initDatabase = async () => {
           section_id INTEGER REFERENCES course_sections(id),
           title VARCHAR(200) NOT NULL,
           description TEXT,
+          instructions TEXT,
           total_marks INTEGER DEFAULT 10,
           due_date TIMESTAMP,
           file_path VARCHAR(255),
+          allow_multiple_submissions BOOLEAN DEFAULT FALSE,
+          allow_late_submissions BOOLEAN DEFAULT TRUE,
+          late_penalty_per_day DECIMAL(5,2) DEFAULT 0,
           created_by INTEGER REFERENCES users(id),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );

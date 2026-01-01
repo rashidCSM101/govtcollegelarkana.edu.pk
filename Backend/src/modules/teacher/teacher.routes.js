@@ -7,6 +7,8 @@ const attendanceController = require('../attendance/attendance.controller');
 const examController = require('../exam/exam.controller');
 const resultController = require('../result/result.controller');
 const reEvaluationController = require('../re-evaluation/re-evaluation.controller');
+const assignmentController = require('../assignment/assignment.controller');
+const leaveController = require('../leave/leave.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -84,5 +86,48 @@ router.get('/re-evaluation/requests', teacherOnly, reEvaluationController.getAss
 
 // Update re-evaluation result
 router.post('/re-evaluation/requests/:requestId/update', teacherOnly, reEvaluationController.updateResult.bind(reEvaluationController));
+
+// ==================== ASSIGNMENT ROUTES (Teacher) ====================
+
+// Create assignment
+router.post('/assignments', teacherOnly, assignmentController.createAssignment.bind(assignmentController));
+
+// Get teacher's assignments
+router.get('/assignments', teacherOnly, assignmentController.getTeacherAssignments.bind(assignmentController));
+
+// Update assignment
+router.put('/assignments/:id', teacherOnly, assignmentController.updateAssignment.bind(assignmentController));
+
+// Get assignment submissions
+router.get('/assignments/:id/submissions', teacherOnly, assignmentController.getAssignmentSubmissions.bind(assignmentController));
+
+// Grade submission
+router.post('/assignments/:id/submissions/:submissionId/grade', teacherOnly, assignmentController.gradeSubmission.bind(assignmentController));
+
+// Bulk grade submissions
+router.post('/assignments/:id/bulk-grade', teacherOnly, assignmentController.bulkGrade.bind(assignmentController));
+
+// Get assignment analytics
+router.get('/assignments/:id/analytics', teacherOnly, assignmentController.getAssignmentAnalytics.bind(assignmentController));
+
+// ==================== LEAVE ROUTES (Teacher) ====================
+
+// Apply for leave
+router.post('/leave/apply', teacherOnly, leaveController.applyTeacherLeave.bind(leaveController));
+
+// Get my leaves
+router.get('/leave/history', teacherOnly, leaveController.getTeacherLeaves.bind(leaveController));
+
+// Get leave balance
+router.get('/leave/balance', teacherOnly, leaveController.getTeacherLeaveBalance.bind(leaveController));
+
+// Get pending student leaves (for approval)
+router.get('/leave/pending', teacherOnly, leaveController.getPendingLeaves.bind(leaveController));
+
+// Approve student leave
+router.post('/leave/approve/:id', teacherOnly, leaveController.approveLeave.bind(leaveController));
+
+// Reject student leave
+router.post('/leave/reject/:id', teacherOnly, leaveController.rejectLeave.bind(leaveController));
 
 module.exports = router;

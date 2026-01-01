@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('./admin.controller');
+const leaveController = require('../leave/leave.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -73,5 +74,19 @@ router.put('/courses/:id', adminController.updateCourse);
 router.delete('/courses/:id', adminController.deleteCourse);
 router.post('/courses/:id/prerequisites', adminController.addCoursePrerequisite);
 router.delete('/courses/:id/prerequisites/:prereqId', adminController.removeCoursePrerequisite);
+
+// ==================== LEAVE ROUTES (Admin) ====================
+
+// Get all teacher leaves
+router.get('/teacher-leaves', leaveController.getAllTeacherLeaves.bind(leaveController));
+
+// Approve teacher leave
+router.post('/teacher-leaves/:id/approve', leaveController.approveTeacherLeave.bind(leaveController));
+
+// Reject teacher leave
+router.post('/teacher-leaves/:id/reject', leaveController.rejectTeacherLeave.bind(leaveController));
+
+// Get leave calendar
+router.get('/leave-calendar', leaveController.getLeaveCalendar.bind(leaveController));
 
 module.exports = router;

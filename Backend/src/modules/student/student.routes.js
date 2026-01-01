@@ -10,6 +10,8 @@ const resultController = require('../result/result.controller');
 const transcriptController = require('../transcript/transcript.controller');
 const reEvaluationController = require('../re-evaluation/re-evaluation.controller');
 const feeController = require('../fee/fee.controller');
+const assignmentController = require('../assignment/assignment.controller');
+const leaveController = require('../leave/leave.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -64,6 +66,17 @@ router.get('/voucher/:feeId/download', studentOnly, feeController.downloadVouche
 router.post('/pay-online', studentOnly, feeController.payOnline.bind(feeController));
 router.get('/receipts', studentOnly, feeController.getReceipts.bind(feeController));
 router.get('/receipt/:id/download', studentOnly, feeController.downloadReceipt.bind(feeController));
+
+// ==================== ASSIGNMENT ROUTES (Student) ====================
+router.get('/assignments', studentOnly, assignmentController.getStudentAssignments.bind(assignmentController));
+router.get('/assignments/:id', studentOnly, assignmentController.getAssignmentDetails.bind(assignmentController));
+router.post('/assignments/:id/submit', studentOnly, assignmentController.submitAssignment.bind(assignmentController));
+router.get('/assignments/submitted', studentOnly, assignmentController.getSubmittedAssignments.bind(assignmentController));
+
+// ==================== LEAVE ROUTES (Student) ====================
+router.post('/leave/apply', studentOnly, leaveController.applyStudentLeave.bind(leaveController));
+router.get('/leave/history', studentOnly, leaveController.getStudentLeaveHistory.bind(leaveController));
+router.get('/leave/balance', studentOnly, leaveController.getStudentLeaveBalance.bind(leaveController));
 
 // ==================== ENROLLMENT ROUTES (Student) ====================
 router.post('/enroll', studentOnly, studentController.enrollInSemester);
