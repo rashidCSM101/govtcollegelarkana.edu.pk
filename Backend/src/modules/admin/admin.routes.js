@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('./admin.controller');
 const leaveController = require('../leave/leave.controller');
+const certificateController = require('../certificate/certificate.controller');
+const feedbackController = require('../feedback/feedback.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -88,5 +90,27 @@ router.post('/teacher-leaves/:id/reject', leaveController.rejectTeacherLeave.bin
 
 // Get leave calendar
 router.get('/leave-calendar', leaveController.getLeaveCalendar.bind(leaveController));
+
+// ==================== CERTIFICATE ROUTES (Admin) ====================
+
+// Get pending certificate requests
+router.get('/certificate/pending', certificateController.getPendingRequests.bind(certificateController));
+
+// Generate certificate
+router.post('/certificate/generate/:id', certificateController.generateCertificate.bind(certificateController));
+
+// Download certificate
+router.get('/certificate/download/:id', certificateController.downloadCertificate.bind(certificateController));
+
+// ==================== FEEDBACK ROUTES (Admin) ====================
+
+// Create feedback form
+router.post('/feedback-forms', feedbackController.createFeedbackForm.bind(feedbackController));
+
+// Get all feedback forms
+router.get('/feedback-forms', feedbackController.getAllFeedbackForms.bind(feedbackController));
+
+// Get feedback reports
+router.get('/feedback-reports', feedbackController.getFeedbackReports.bind(feedbackController));
 
 module.exports = router;

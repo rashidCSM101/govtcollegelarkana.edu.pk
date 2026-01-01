@@ -12,6 +12,8 @@ const reEvaluationController = require('../re-evaluation/re-evaluation.controlle
 const feeController = require('../fee/fee.controller');
 const assignmentController = require('../assignment/assignment.controller');
 const leaveController = require('../leave/leave.controller');
+const certificateController = require('../certificate/certificate.controller');
+const feedbackController = require('../feedback/feedback.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -94,6 +96,14 @@ router.get('/check-prerequisites/:course_id', studentOnly, studentController.che
 router.post('/waiting-list', studentOnly, studentController.addToWaitingList);
 router.get('/waiting-list', studentOnly, studentController.getWaitingList);
 router.delete('/waiting-list/:id', studentOnly, studentController.removeFromWaitingList);
+
+// ==================== CERTIFICATE ROUTES (Student) ====================
+router.post('/certificate/request', studentOnly, certificateController.requestCertificate.bind(certificateController));
+router.get('/certificate/requests', studentOnly, certificateController.getStudentRequests.bind(certificateController));
+
+// ==================== FEEDBACK ROUTES (Student) ====================
+router.get('/feedback-forms', studentOnly, feedbackController.getAvailableFeedbackForms.bind(feedbackController));
+router.post('/feedback/submit', studentOnly, feedbackController.submitFeedback.bind(feedbackController));
 
 // ==================== COURSE SECTIONS ROUTES (Admin) ====================
 router.post('/sections', adminOnly, studentController.createSection);
