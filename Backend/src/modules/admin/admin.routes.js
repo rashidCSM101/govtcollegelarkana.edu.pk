@@ -13,6 +13,9 @@ const calendarController = require('../calendar/calendar.controller');
 const idcardController = require('../idcard/idcard.controller');
 const reportController = require('../report/report.controller');
 const dashboardController = require('../dashboard/dashboard.controller');
+const exportController = require('../export/export.controller');
+const backupController = require('../backup/backup.controller');
+const auditController = require('../audit/audit.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -262,5 +265,41 @@ router.get('/reports/teachers', reportController.getTeacherReports.bind(reportCo
 
 // Export report
 router.get('/reports/export/:type', reportController.exportReport.bind(reportController));
+
+// ==================== EXPORT ROUTES ====================
+
+// Export module data (students, teachers, attendance, results, fees, departments, courses)
+router.get('/export/:module', exportController.exportModuleData.bind(exportController));
+
+// ==================== BACKUP ROUTES ====================
+
+// Create manual backup
+router.post('/backup/create', backupController.createBackup.bind(backupController));
+
+// List all backups
+router.get('/backup/list', backupController.listBackups.bind(backupController));
+
+// Restore from backup
+router.post('/backup/restore', backupController.restoreBackup.bind(backupController));
+
+// Download backup file
+router.get('/backup/download/:backupId', backupController.downloadBackup.bind(backupController));
+
+// ==================== AUDIT LOG ROUTES ====================
+
+// Get all audit logs
+router.get('/audit-logs', auditController.getAuditLogs.bind(auditController));
+
+// Get login/logout logs
+router.get('/audit-logs/login', auditController.getLoginLogs.bind(auditController));
+
+// Get data modification logs
+router.get('/audit-logs/modifications', auditController.getDataModificationLogs.bind(auditController));
+
+// Get security logs
+router.get('/audit-logs/security', auditController.getSecurityLogs.bind(auditController));
+
+// Get audit statistics
+router.get('/audit-logs/statistics', auditController.getAuditStatistics.bind(auditController));
 
 module.exports = router;
