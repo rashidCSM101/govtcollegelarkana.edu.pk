@@ -1,0 +1,5 @@
+# Attendance Module
+# This module will contain:
+# - attendance.controller.js
+# - attendance.routes.js
+# - attendance.service.js

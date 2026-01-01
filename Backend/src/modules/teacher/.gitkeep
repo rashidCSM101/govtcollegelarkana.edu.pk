@@ -1,0 +1,5 @@
+# Teacher Module
+# This module will contain:
+# - teacher.controller.js
+# - teacher.routes.js
+# - teacher.service.js

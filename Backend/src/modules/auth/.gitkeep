@@ -1,0 +1,5 @@
+# Auth Module
+# This module will contain:
+# - auth.controller.js
+# - auth.routes.js
+# - auth.service.js

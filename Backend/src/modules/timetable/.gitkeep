@@ -1,0 +1,5 @@
+# Timetable Module
+# This module will contain:
+# - timetable.controller.js
+# - timetable.routes.js
+# - timetable.service.js

@@ -1,0 +1,5 @@
+# Certificate Module
+# This module will contain:
+# - certificate.controller.js
+# - certificate.routes.js
+# - certificate.service.js

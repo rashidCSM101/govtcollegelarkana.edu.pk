@@ -1,0 +1,5 @@
+# Admin Module
+# This module will contain:
+# - admin.controller.js
+# - admin.routes.js
+# - admin.service.js

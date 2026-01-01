@@ -1,0 +1,5 @@
+# Fee Module
+# This module will contain:
+# - fee.controller.js
+# - fee.routes.js
+# - fee.service.js

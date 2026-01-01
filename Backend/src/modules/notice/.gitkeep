@@ -1,0 +1,5 @@
+# Notice Module
+# This module will contain:
+# - notice.controller.js
+# - notice.routes.js
+# - notice.service.js

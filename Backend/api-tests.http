@@ -1,0 +1,476 @@
+### Government College Larkana API Tests
+### Use REST Client extension or Thunder Client
+
+### Variables
+@baseUrl = http://localhost:3000/api
+@token = YOUR_ACCESS_TOKEN_HERE
+
+### ========================================
+### HEALTH CHECK
+### ========================================
+
+### Check API Status
+GET http://localhost:3000/
+
+### ========================================
+### AUTH APIs
+### ========================================
+
+### Login (Admin)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@govtcollegelarkana.edu.pk",
+  "password": "Admin@123"
+}
+
+### Register Student
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "student@example.com",
+  "password": "Student@123",
+  "role": "student",
+  "name": "Test Student",
+  "father_name": "Father Name",
+  "phone": "03001234567"
+}
+
+### Register Teacher
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "teacher@example.com",
+  "password": "Teacher@123",
+  "role": "teacher",
+  "name": "Test Teacher",
+  "phone": "03001234567",
+  "designation": "Lecturer"
+}
+
+### Forgot Password
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "admin@govtcollegelarkana.edu.pk"
+}
+
+### Reset Password (use token from email)
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "reset_token_here",
+  "newPassword": "NewPassword@123"
+}
+
+### ========================================
+### PROTECTED AUTH ROUTES (Need Token)
+### ========================================
+
+### Get Profile
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{token}}
+
+### Update Profile
+PUT {{baseUrl}}/auth/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "phone": "03009876543"
+}
+
+### Change Password
+POST {{baseUrl}}/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Admin@123",
+  "newPassword": "NewAdmin@123"
+}
+
+### Get Current User
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "your_refresh_token_here"
+}
+
+### ========================================
+### ADMIN - DASHBOARD
+### ========================================
+
+### Get Dashboard Stats
+GET {{baseUrl}}/admin/dashboard
+Authorization: Bearer {{token}}
+
+### ========================================
+### ADMIN - STUDENT MANAGEMENT
+### ========================================
+
+### Add Student
+POST {{baseUrl}}/admin/students
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "newstudent@example.com",
+  "name": "Ali Ahmed",
+  "father_name": "Ahmed Khan",
+  "roll_no": "CS-2026-001",
+  "dob": "2005-05-15",
+  "cnic": "12345-1234567-1",
+  "phone": "03001234567",
+  "address": "Larkana, Sindh",
+  "batch": "2025-2029",
+  "department_id": 1,
+  "semester": 1
+}
+
+### Get All Students (with pagination & filters)
+GET {{baseUrl}}/admin/students?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Get Students with Filters
+GET {{baseUrl}}/admin/students?department_id=1&semester=1&status=active
+Authorization: Bearer {{token}}
+
+### Search Students
+GET {{baseUrl}}/admin/students/search?q=ali
+Authorization: Bearer {{token}}
+
+### Get Student by ID
+GET {{baseUrl}}/admin/students/1
+Authorization: Bearer {{token}}
+
+### Update Student
+PUT {{baseUrl}}/admin/students/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Ali Ahmed Khan",
+  "phone": "03009876543",
+  "semester": 2
+}
+
+### Deactivate Student (soft delete)
+DELETE {{baseUrl}}/admin/students/1
+Authorization: Bearer {{token}}
+
+### Permanently Delete Student
+DELETE {{baseUrl}}/admin/students/1?permanent=true
+Authorization: Bearer {{token}}
+
+### ========================================
+### ADMIN - TEACHER MANAGEMENT
+### ========================================
+
+### Add Teacher
+POST {{baseUrl}}/admin/teachers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "newteacher@example.com",
+  "name": "Dr. Aslam Shah",
+  "cnic": "12345-1234567-2",
+  "phone": "03001234568",
+  "designation": "Assistant Professor",
+  "department_id": 1,
+  "qualification": "PhD Computer Science",
+  "specialization": "Machine Learning",
+  "experience": 5
+}
+
+### Get All Teachers
+GET {{baseUrl}}/admin/teachers?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Get Teachers with Filters
+GET {{baseUrl}}/admin/teachers?department_id=1&designation=Professor
+Authorization: Bearer {{token}}
+
+### Get Teacher by ID
+GET {{baseUrl}}/admin/teachers/1
+Authorization: Bearer {{token}}
+
+### Update Teacher
+PUT {{baseUrl}}/admin/teachers/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "designation": "Associate Professor",
+  "experience": 6
+}
+
+### Assign Course to Teacher
+POST {{baseUrl}}/admin/teachers/1/assign-course
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "course_id": 1,
+  "semester_id": 1,
+  "section_name": "A",
+  "capacity": 50,
+  "room_no": "CS-101"
+}
+
+### Deactivate Teacher
+DELETE {{baseUrl}}/admin/teachers/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### ADMIN - ADMIN MANAGEMENT
+### ========================================
+
+### Add New Admin
+POST {{baseUrl}}/admin/admins
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "newadmin@govtcollegelarkana.edu.pk",
+  "name": "Admin User",
+  "admin_role": "admin"
+}
+
+### Get All Admins
+GET {{baseUrl}}/admin/admins
+Authorization: Bearer {{token}}
+
+### Update Admin Role
+PUT {{baseUrl}}/admin/admins/1/role
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "role": "moderator"
+}
+
+### ========================================
+### ADMIN - DEPARTMENT MANAGEMENT
+### ========================================
+
+### Get All Departments
+GET {{baseUrl}}/admin/departments
+Authorization: Bearer {{token}}
+
+### Add Department
+POST {{baseUrl}}/admin/departments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Software Engineering",
+  "code": "SE",
+  "description": "Department of Software Engineering"
+}
+
+### Get Department Statistics
+GET {{baseUrl}}/admin/departments/1/stats
+Authorization: Bearer {{token}}
+
+### Update Department
+PUT {{baseUrl}}/admin/departments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "hod_teacher_id": 1
+}
+
+### ========================================
+### ADMIN - SESSION MANAGEMENT
+### ========================================
+
+### Create Academic Session
+POST {{baseUrl}}/admin/sessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "2025-2026",
+  "start_date": "2025-09-01",
+  "end_date": "2026-06-30",
+  "is_current": true
+}
+
+### Get All Sessions
+GET {{baseUrl}}/admin/sessions
+Authorization: Bearer {{token}}
+
+### Get All Sessions (including inactive)
+GET {{baseUrl}}/admin/sessions?all=true
+Authorization: Bearer {{token}}
+
+### Update Session
+PUT {{baseUrl}}/admin/sessions/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_current": true
+}
+
+### Deactivate Session
+PUT {{baseUrl}}/admin/sessions/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_active": false
+}
+
+### ========================================
+### ADMIN - SEMESTER MANAGEMENT
+### ========================================
+
+### Create Semester
+POST {{baseUrl}}/admin/semesters
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "session_id": 1,
+  "name": "Fall 2025",
+  "number": 1,
+  "start_date": "2025-09-01",
+  "end_date": "2025-12-31",
+  "is_current": true
+}
+
+### Get All Semesters
+GET {{baseUrl}}/admin/semesters
+Authorization: Bearer {{token}}
+
+### Get Semesters by Session
+GET {{baseUrl}}/admin/semesters?session_id=1
+Authorization: Bearer {{token}}
+
+### Get Current Semester
+GET {{baseUrl}}/admin/semesters?is_current=true
+Authorization: Bearer {{token}}
+
+### Get Semester Details
+GET {{baseUrl}}/admin/semesters/1
+Authorization: Bearer {{token}}
+
+### Update Semester
+PUT {{baseUrl}}/admin/semesters/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_current": true
+}
+
+### Deactivate Semester
+PUT {{baseUrl}}/admin/semesters/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_active": false
+}
+
+### ========================================
+### ADMIN - COURSE MANAGEMENT
+### ========================================
+
+### Create Course
+POST {{baseUrl}}/admin/courses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "code": "CS-101",
+  "name": "Introduction to Computer Science",
+  "description": "Fundamental concepts of computer science",
+  "credit_hours": 3,
+  "department_id": 1,
+  "course_type": "theory",
+  "lecture_hours": 3,
+  "lab_hours": 0
+}
+
+### Create Lab Course
+POST {{baseUrl}}/admin/courses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "code": "CS-102",
+  "name": "Programming Fundamentals Lab",
+  "description": "Hands-on programming practice",
+  "credit_hours": 1,
+  "department_id": 1,
+  "course_type": "lab",
+  "lecture_hours": 0,
+  "lab_hours": 3
+}
+
+### Get All Courses
+GET {{baseUrl}}/admin/courses
+Authorization: Bearer {{token}}
+
+### Get Courses by Department
+GET {{baseUrl}}/admin/courses?department_id=1
+Authorization: Bearer {{token}}
+
+### Search Courses
+GET {{baseUrl}}/admin/courses?search=computer
+Authorization: Bearer {{token}}
+
+### Get Course Details
+GET {{baseUrl}}/admin/courses/1
+Authorization: Bearer {{token}}
+
+### Update Course
+PUT {{baseUrl}}/admin/courses/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "credit_hours": 4,
+  "description": "Updated course description"
+}
+
+### Add Course Prerequisite
+POST {{baseUrl}}/admin/courses/2/prerequisites
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "prerequisite_id": 1
+}
+
+### Remove Course Prerequisite
+DELETE {{baseUrl}}/admin/courses/2/prerequisites/1
+Authorization: Bearer {{token}}
+
+### Deactivate Course (soft delete)
+DELETE {{baseUrl}}/admin/courses/1
+Authorization: Bearer {{token}}
+
+### Delete Course Permanently
+DELETE {{baseUrl}}/admin/courses/1?permanent=true
+Authorization: Bearer {{token}}
