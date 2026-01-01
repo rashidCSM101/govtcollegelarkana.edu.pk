@@ -130,6 +130,10 @@ const initDatabase = async () => {
           start_date DATE,
           end_date DATE,
           is_active BOOLEAN DEFAULT FALSE,
+          results_published BOOLEAN DEFAULT FALSE,
+          results_published_at TIMESTAMP,
+          results_frozen BOOLEAN DEFAULT FALSE,
+          results_frozen_at TIMESTAMP,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -282,6 +286,8 @@ const initDatabase = async () => {
           end_time TIME,
           room_no VARCHAR(20),
           total_marks INTEGER DEFAULT 100,
+          weightage INTEGER DEFAULT 100,
+          marks_locked BOOLEAN DEFAULT FALSE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -337,7 +343,8 @@ const initDatabase = async () => {
           question_id INTEGER REFERENCES exam_questions(id) ON DELETE CASCADE,
           student_answer TEXT,
           is_correct BOOLEAN,
-          marks_obtained DECIMAL(5,2) DEFAULT 0
+          marks_obtained DECIMAL(5,2) DEFAULT 0,
+          UNIQUE(attempt_id, question_id)
       );
 
       -- =====================================================
@@ -413,9 +420,29 @@ const initDatabase = async () => {
       CREATE TABLE IF NOT EXISTS transcripts (
           id SERIAL PRIMARY KEY,
           student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+          verification_code VARCHAR(50) UNIQUE,
           generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           generated_by INTEGER REFERENCES users(id),
-          status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'issued', 'revoked'))
+          status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'issued', 'revoked')),
+          revoked_at TIMESTAMP,
+          revoked_by INTEGER REFERENCES users(id)
+      );
+
+      -- =====================================================
+      -- 28B. TRANSCRIPT REQUESTS TABLE
+      -- =====================================================
+      CREATE TABLE IF NOT EXISTS transcript_requests (
+          id SERIAL PRIMARY KEY,
+          student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+          purpose VARCHAR(200),
+          copies INTEGER DEFAULT 1,
+          delivery_type VARCHAR(20) DEFAULT 'pickup' CHECK (delivery_type IN ('pickup', 'courier', 'email')),
+          status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'issued')),
+          transcript_id INTEGER REFERENCES transcripts(id),
+          approved_by INTEGER REFERENCES users(id),
+          approved_at TIMESTAMP,
+          remarks TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
       -- =====================================================
@@ -425,12 +452,23 @@ const initDatabase = async () => {
           id SERIAL PRIMARY KEY,
           student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
           exam_schedule_id INTEGER REFERENCES exam_schedule(id),
-          reason TEXT,
-          request_date DATE DEFAULT CURRENT_DATE,
-          status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'completed')),
+          reason TEXT NOT NULL,
+          request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'approved', 'rejected', 'in_review', 'completed')),
+          current_marks DECIMAL(5,2),
+          new_marks DECIMAL(5,2),
+          fee_amount DECIMAL(10,2) DEFAULT 500.00,
+          fee_paid BOOLEAN DEFAULT FALSE,
+          payment_method VARCHAR(50),
+          transaction_id VARCHAR(100),
+          paid_at TIMESTAMP,
+          approved_at TIMESTAMP,
+          assigned_to INTEGER REFERENCES users(id),
+          assigned_at TIMESTAMP,
           resolved_by INTEGER REFERENCES users(id),
           resolved_at TIMESTAMP,
-          new_marks DECIMAL(5,2)
+          remarks TEXT,
+          instructions TEXT
       );
 
       -- =====================================================
@@ -782,6 +820,62 @@ const initDatabase = async () => {
     `);
     
     console.log('✅ Indexes created successfully');
+    
+    // Add columns if they don't exist (for existing databases)
+    await client.query(`
+      -- Add weightage and marks_locked to exam_schedule if not exists
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='exam_schedule' AND column_name='weightage') THEN
+          ALTER TABLE exam_schedule ADD COLUMN weightage INTEGER DEFAULT 100;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='exam_schedule' AND column_name='marks_locked') THEN
+          ALTER TABLE exam_schedule ADD COLUMN marks_locked BOOLEAN DEFAULT FALSE;
+        END IF;
+        
+        -- Add result publication columns to semesters if not exists
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='semesters' AND column_name='results_published') THEN
+          ALTER TABLE semesters ADD COLUMN results_published BOOLEAN DEFAULT FALSE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='semesters' AND column_name='results_published_at') THEN
+          ALTER TABLE semesters ADD COLUMN results_published_at TIMESTAMP;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='semesters' AND column_name='results_frozen') THEN
+          ALTER TABLE semesters ADD COLUMN results_frozen BOOLEAN DEFAULT FALSE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='semesters' AND column_name='results_frozen_at') THEN
+          ALTER TABLE semesters ADD COLUMN results_frozen_at TIMESTAMP;
+        END IF;
+        
+        -- Add verification_code and revoked columns to transcripts if not exists
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='transcripts' AND column_name='verification_code') THEN
+          ALTER TABLE transcripts ADD COLUMN verification_code VARCHAR(50) UNIQUE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='transcripts' AND column_name='revoked_at') THEN
+          ALTER TABLE transcripts ADD COLUMN revoked_at TIMESTAMP;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='transcripts' AND column_name='revoked_by') THEN
+          ALTER TABLE transcripts ADD COLUMN revoked_by INTEGER REFERENCES users(id);
+        END IF;
+        
+        -- Create transcript_requests table if not exists
+        CREATE TABLE IF NOT EXISTS transcript_requests (
+          id SERIAL PRIMARY KEY,
+          student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+          purpose VARCHAR(200),
+          copies INTEGER DEFAULT 1,
+          delivery_type VARCHAR(20) DEFAULT 'pickup' CHECK (delivery_type IN ('pickup', 'courier', 'email')),
+          status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'issued')),
+          transcript_id INTEGER REFERENCES transcripts(id),
+          approved_by INTEGER REFERENCES users(id),
+          approved_at TIMESTAMP,
+          remarks TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      END $$;
+    `);
+    
+    console.log('✅ Schema migrations applied');
     
     // Create update trigger function
     await client.query(`

@@ -474,3 +474,1008 @@ Authorization: Bearer {{token}}
 ### Delete Course Permanently
 DELETE {{baseUrl}}/admin/courses/1?permanent=true
 Authorization: Bearer {{token}}
+
+### ========================================
+### STUDENT - ENROLLMENT
+### ========================================
+### Note: Use a student token for these APIs
+
+### Login as Student (first create one via admin)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "student@example.com",
+  "password": "temppassword"
+}
+
+### Enroll in Semester
+POST {{baseUrl}}/student/enroll
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "session_id": 1,
+  "semester_id": 1
+}
+
+### Get Enrollment History
+GET {{baseUrl}}/student/enrollment-history
+Authorization: Bearer {{token}}
+
+### Verify Enrollment
+GET {{baseUrl}}/student/verify-enrollment/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### STUDENT - COURSE REGISTRATION
+### ========================================
+
+### Get Available Courses
+GET {{baseUrl}}/student/available-courses?semester_id=1
+Authorization: Bearer {{token}}
+
+### Register for Course
+POST {{baseUrl}}/student/register-course
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "course_id": 1,
+  "section_id": 1,
+  "semester_id": 1
+}
+
+### Get Registered Courses
+GET {{baseUrl}}/student/registered-courses
+Authorization: Bearer {{token}}
+
+### Get Registered Courses for Specific Semester
+GET {{baseUrl}}/student/registered-courses?semester_id=1
+Authorization: Bearer {{token}}
+
+### Check Prerequisites for a Course
+GET {{baseUrl}}/student/check-prerequisites/2
+Authorization: Bearer {{token}}
+
+### Drop Course
+DELETE {{baseUrl}}/student/drop-course/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### STUDENT - WAITING LIST
+### ========================================
+
+### Add to Waiting List
+POST {{baseUrl}}/student/waiting-list
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "course_id": 1,
+  "semester_id": 1
+}
+
+### Get My Waiting List
+GET {{baseUrl}}/student/waiting-list
+Authorization: Bearer {{token}}
+
+### Remove from Waiting List
+DELETE {{baseUrl}}/student/waiting-list/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### ADMIN - COURSE SECTIONS
+### ========================================
+
+### Create Course Section
+POST {{baseUrl}}/student/sections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "course_id": 1,
+  "semester_id": 1,
+  "teacher_id": 1,
+  "section_name": "A",
+  "capacity": 50,
+  "room_no": "CS-101"
+}
+
+### Get Course Sections
+GET {{baseUrl}}/student/sections?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Sections by Course
+GET {{baseUrl}}/student/sections?course_id=1&semester_id=1
+Authorization: Bearer {{token}}
+
+### Update Section
+PUT {{baseUrl}}/student/sections/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "capacity": 60,
+  "room_no": "CS-102"
+}
+
+### Delete Section
+DELETE {{baseUrl}}/student/sections/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### TIMETABLE - ADMIN OPERATIONS
+### ========================================
+
+### Create Timetable Slot
+POST {{baseUrl}}/timetable
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "section_id": 1,
+  "day": "Monday",
+  "start_time": "09:00",
+  "end_time": "10:30",
+  "room_no": "CS-101"
+}
+
+### Create Another Slot (Tuesday)
+POST {{baseUrl}}/timetable
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "section_id": 1,
+  "day": "Tuesday",
+  "start_time": "11:00",
+  "end_time": "12:30",
+  "room_no": "CS-101"
+}
+
+### Bulk Create Slots
+POST {{baseUrl}}/timetable/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "slots": [
+    {
+      "section_id": 1,
+      "day": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:30",
+      "room_no": "CS-101"
+    },
+    {
+      "section_id": 1,
+      "day": "Thursday",
+      "start_time": "14:00",
+      "end_time": "15:30",
+      "room_no": "CS-102"
+    }
+  ]
+}
+
+### Get All Slots
+GET {{baseUrl}}/timetable/slots?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Slots by Day
+GET {{baseUrl}}/timetable/slots?day=Monday&semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Slots by Room
+GET {{baseUrl}}/timetable/slots?room_no=CS-101&semester_id=1
+Authorization: Bearer {{token}}
+
+### Update Slot
+PUT {{baseUrl}}/timetable/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "start_time": "10:00",
+  "end_time": "11:30",
+  "room_no": "CS-103"
+}
+
+### Delete Slot
+DELETE {{baseUrl}}/timetable/1
+Authorization: Bearer {{token}}
+
+### Clear All Slots for Section
+DELETE {{baseUrl}}/timetable/section/1/clear
+Authorization: Bearer {{token}}
+
+### ========================================
+### TIMETABLE - CONFLICT DETECTION
+### ========================================
+
+### Check Conflicts for a Slot
+POST {{baseUrl}}/timetable/check-conflicts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "section_id": 2,
+  "day": "Monday",
+  "start_time": "09:00",
+  "end_time": "10:30",
+  "room_no": "CS-101",
+  "teacher_id": 1,
+  "semester_id": 1
+}
+
+### Get All Conflicts for Semester
+GET {{baseUrl}}/timetable/conflicts?semester_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### TIMETABLE - VIEW BY ROLE
+### ========================================
+
+### Get Student Timetable (as Student)
+GET {{baseUrl}}/student/timetable
+Authorization: Bearer {{token}}
+
+### Get Student Timetable for Specific Semester
+GET {{baseUrl}}/student/timetable?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Teacher Timetable (as Teacher)
+GET {{baseUrl}}/teacher/timetable
+Authorization: Bearer {{token}}
+
+### Get Teacher Timetable for Specific Semester
+GET {{baseUrl}}/teacher/timetable?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Room Timetable
+GET {{baseUrl}}/timetable/room?room_no=CS-101&semester_id=1
+Authorization: Bearer {{token}}
+
+### Get All Rooms
+GET {{baseUrl}}/timetable/rooms?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Master Timetable (All Sections)
+GET {{baseUrl}}/timetable/master?semester_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### TIMETABLE - PDF EXPORT
+### ========================================
+
+### Export Student Timetable PDF (current user)
+GET {{baseUrl}}/timetable/export-pdf?type=student&semester_id=1
+Authorization: Bearer {{token}}
+
+### Export Teacher Timetable PDF (current user)
+GET {{baseUrl}}/timetable/export-pdf?type=teacher&semester_id=1
+Authorization: Bearer {{token}}
+
+### Export Room Timetable PDF
+GET {{baseUrl}}/timetable/export-pdf?type=room&id=CS-101&semester_id=1
+Authorization: Bearer {{token}}
+
+### Export Master Timetable PDF
+GET {{baseUrl}}/timetable/export-pdf?type=master&semester_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### ATTENDANCE - TEACHER OPERATIONS
+### ========================================
+
+### Get Students for Marking Attendance
+GET {{baseUrl}}/teacher/attendance/students?section_id=1&date=2026-01-02
+Authorization: Bearer {{token}}
+
+### Mark Single Student Attendance
+POST {{baseUrl}}/teacher/attendance/mark
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "section_id": 1,
+  "student_id": 1,
+  "date": "2026-01-02",
+  "status": "present"
+}
+
+### Bulk Mark Attendance
+POST {{baseUrl}}/teacher/attendance/bulk-mark
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "section_id": 1,
+  "date": "2026-01-02",
+  "attendance_list": [
+    { "student_id": 1, "status": "present" },
+    { "student_id": 2, "status": "present" },
+    { "student_id": 3, "status": "absent" },
+    { "student_id": 4, "status": "late" },
+    { "student_id": 5, "status": "leave" }
+  ]
+}
+
+### Edit Attendance
+PUT {{baseUrl}}/teacher/attendance/edit/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "present"
+}
+
+### Get Section Attendance (Teacher view)
+GET {{baseUrl}}/teacher/attendance/section/1
+Authorization: Bearer {{token}}
+
+### Get Section Attendance by Date
+GET {{baseUrl}}/teacher/attendance/section/1?date=2026-01-02
+Authorization: Bearer {{token}}
+
+### Get Section Attendance by Date Range
+GET {{baseUrl}}/teacher/attendance/section/1?start_date=2026-01-01&end_date=2026-01-31
+Authorization: Bearer {{token}}
+
+### ========================================
+### ATTENDANCE - STUDENT VIEW
+### ========================================
+
+### Get My Attendance (all courses)
+GET {{baseUrl}}/student/attendance
+Authorization: Bearer {{token}}
+
+### Get My Attendance (specific semester)
+GET {{baseUrl}}/student/attendance?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get My Attendance (specific course)
+GET {{baseUrl}}/student/attendance?course_id=1
+Authorization: Bearer {{token}}
+
+### Get My Attendance Summary (percentage per course)
+GET {{baseUrl}}/student/attendance/summary
+Authorization: Bearer {{token}}
+
+### Get My Attendance Summary (specific semester)
+GET {{baseUrl}}/student/attendance/summary?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get My Attendance for Specific Course
+GET {{baseUrl}}/student/attendance/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### ATTENDANCE - ADMIN REPORTS
+### ========================================
+
+### Get Attendance Reports (grouped by course)
+GET {{baseUrl}}/admin/attendance/reports?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Attendance Reports (grouped by department)
+GET {{baseUrl}}/admin/attendance/reports?group_by=department&semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Attendance Reports (grouped by student)
+GET {{baseUrl}}/admin/attendance/reports?group_by=student&semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Attendance Reports (grouped by date)
+GET {{baseUrl}}/admin/attendance/reports?group_by=date&start_date=2026-01-01&end_date=2026-01-31
+Authorization: Bearer {{token}}
+
+### Get Attendance Reports (filtered by department)
+GET {{baseUrl}}/admin/attendance/reports?department_id=1&semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Defaulters List
+GET {{baseUrl}}/admin/attendance/defaulters?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Defaulters with Custom Threshold (80%)
+GET {{baseUrl}}/admin/attendance/defaulters?semester_id=1&threshold=80
+Authorization: Bearer {{token}}
+
+### Get Defaulters by Department
+GET {{baseUrl}}/admin/attendance/defaulters?semester_id=1&department_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### ATTENDANCE - ANALYTICS
+### ========================================
+
+### Get Attendance Analytics (last 30 days)
+GET {{baseUrl}}/admin/attendance/analytics?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Attendance Analytics (last 7 days)
+GET {{baseUrl}}/admin/attendance/analytics?semester_id=1&days=7
+Authorization: Bearer {{token}}
+
+### Get Attendance Analytics by Department
+GET {{baseUrl}}/admin/attendance/analytics?department_id=1&days=30
+Authorization: Bearer {{token}}
+
+### Get Attendance Analytics by Course
+GET {{baseUrl}}/admin/attendance/analytics?course_id=1&days=30
+Authorization: Bearer {{token}}
+
+### ========================================
+### EXAM - ADMIN OPERATIONS
+### ========================================
+
+### Create Exam
+POST {{baseUrl}}/admin/exams
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Midterm Examination Spring 2026",
+  "type": "midterm",
+  "semester_id": 1,
+  "start_date": "2026-03-01",
+  "end_date": "2026-03-15"
+}
+
+### Get All Exams
+GET {{baseUrl}}/admin/exams
+Authorization: Bearer {{token}}
+
+### Get Exams by Semester
+GET {{baseUrl}}/admin/exams?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Exams by Type
+GET {{baseUrl}}/admin/exams?type=midterm
+Authorization: Bearer {{token}}
+
+### Get Upcoming Exams
+GET {{baseUrl}}/admin/exams?status=upcoming
+Authorization: Bearer {{token}}
+
+### Get Exam by ID
+GET {{baseUrl}}/admin/exams/1
+Authorization: Bearer {{token}}
+
+### Update Exam
+PUT {{baseUrl}}/admin/exams/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Midterm Examination Spring 2026 - Updated",
+  "end_date": "2026-03-20"
+}
+
+### Delete Exam
+DELETE {{baseUrl}}/admin/exams/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### EXAM SCHEDULE - ADMIN
+### ========================================
+
+### Create Exam Schedule
+POST {{baseUrl}}/admin/exam-schedule
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_id": 1,
+  "course_id": 1,
+  "date": "2026-03-05",
+  "start_time": "09:00",
+  "end_time": "12:00",
+  "room_no": "HALL-A",
+  "total_marks": 100
+}
+
+### Get All Exam Schedules
+GET {{baseUrl}}/admin/exam-schedule
+Authorization: Bearer {{token}}
+
+### Get Schedules by Exam
+GET {{baseUrl}}/admin/exam-schedule?exam_id=1
+Authorization: Bearer {{token}}
+
+### Get Schedules by Date Range
+GET {{baseUrl}}/admin/exam-schedule?start_date=2026-03-01&end_date=2026-03-31
+Authorization: Bearer {{token}}
+
+### Update Exam Schedule
+PUT {{baseUrl}}/admin/exam-schedule/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "room_no": "HALL-B",
+  "start_time": "10:00"
+}
+
+### Delete Exam Schedule
+DELETE {{baseUrl}}/admin/exam-schedule/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### HALL TICKETS - ADMIN
+### ========================================
+
+### Generate Hall Tickets for Exam
+POST {{baseUrl}}/admin/generate-hall-tickets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_id": 1
+}
+
+### ========================================
+### EXAM SCHEDULE & HALL TICKET - STUDENT
+### ========================================
+
+### Get My Exam Schedule (Student)
+GET {{baseUrl}}/student/exam-schedule
+Authorization: Bearer {{token}}
+
+### Get My Hall Ticket
+GET {{baseUrl}}/student/hall-ticket/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### ONLINE EXAM - TEACHER OPERATIONS
+### ========================================
+
+### Create Online Exam
+POST {{baseUrl}}/teacher/online-exam
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_schedule_id": 1,
+  "duration_minutes": 90,
+  "passing_marks": 40,
+  "instructions": "1. No cheating allowed\\n2. All questions are compulsory\\n3. Each MCQ carries 2 marks"
+}
+
+### Add Questions to Online Exam
+POST {{baseUrl}}/teacher/online-exam/1/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questions": [
+    {
+      "question_text": "What is the capital of Pakistan?",
+      "question_type": "mcq",
+      "options": ["Lahore", "Karachi", "Islamabad", "Peshawar"],
+      "correct_answer": "Islamabad",
+      "marks": 2
+    },
+    {
+      "question_text": "Pakistan was created in 1947.",
+      "question_type": "true_false",
+      "options": ["True", "False"],
+      "correct_answer": "True",
+      "marks": 1
+    },
+    {
+      "question_text": "Define the term 'algorithm' in your own words.",
+      "question_type": "short",
+      "marks": 5
+    },
+    {
+      "question_text": "Explain the importance of data structures in programming with examples.",
+      "question_type": "long",
+      "marks": 10
+    }
+  ]
+}
+
+### Get Online Exam Questions (Teacher View)
+GET {{baseUrl}}/teacher/online-exam/1
+Authorization: Bearer {{token}}
+
+### Update Question
+PUT {{baseUrl}}/teacher/online-exam/question/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marks": 3,
+  "correct_answer": "Islamabad"
+}
+
+### Delete Question
+DELETE {{baseUrl}}/teacher/online-exam/question/1
+Authorization: Bearer {{token}}
+
+### Activate Online Exam
+PATCH {{baseUrl}}/teacher/online-exam/1/toggle
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_active": true
+}
+
+### Deactivate Online Exam
+PATCH {{baseUrl}}/teacher/online-exam/1/toggle
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_active": false
+}
+
+### ========================================
+### ONLINE EXAM - STUDENT OPERATIONS
+### ========================================
+
+### Get My Online Exams (Student)
+GET {{baseUrl}}/student/online-exams
+Authorization: Bearer {{token}}
+
+### Get Online Exam Details (Student)
+GET {{baseUrl}}/student/online-exam/1
+Authorization: Bearer {{token}}
+
+### Start Online Exam (Student)
+POST {{baseUrl}}/student/online-exam/1/start
+Authorization: Bearer {{token}}
+
+### Save Answer (Auto-save)
+POST {{baseUrl}}/student/online-exam/1/answer
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question_id": 1,
+  "answer": "Islamabad"
+}
+
+### Submit Online Exam
+POST {{baseUrl}}/student/online-exam/1/submit
+Authorization: Bearer {{token}}
+
+### ========================================
+### MARKS ENTRY - TEACHER
+### ========================================
+
+### Enter Marks for Single Student
+POST {{baseUrl}}/teacher/marks/enter
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "student_id": 1,
+  "exam_schedule_id": 1,
+  "obtained_marks": 85,
+  "total_marks": 100
+}
+
+### Edit Marks
+PUT {{baseUrl}}/teacher/marks/edit/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "obtained_marks": 88
+}
+
+### Bulk Enter Marks
+POST {{baseUrl}}/teacher/marks/bulk-enter
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_schedule_id": 1,
+  "marks_list": [
+    { "student_id": 1, "obtained_marks": 85 },
+    { "student_id": 2, "obtained_marks": 72 },
+    { "student_id": 3, "obtained_marks": 90 },
+    { "student_id": 4, "obtained_marks": 55 },
+    { "student_id": 5, "obtained_marks": 38 }
+  ]
+}
+
+### Bulk Upload Marks (CSV Format)
+POST {{baseUrl}}/teacher/marks/bulk-upload
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_schedule_id": 1,
+  "marks_list": [
+    { "roll_no": "2025-CS-001", "obtained_marks": 85 },
+    { "roll_no": "2025-CS-002", "obtained_marks": 72 },
+    { "roll_no": "2025-CS-003", "obtained_marks": 90 }
+  ]
+}
+
+### Lock Marks
+POST {{baseUrl}}/teacher/marks/lock
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_schedule_id": 1,
+  "lock": true
+}
+
+### Unlock Marks
+POST {{baseUrl}}/teacher/marks/lock
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "exam_schedule_id": 1,
+  "lock": false
+}
+
+### Get Exam Marks
+GET {{baseUrl}}/teacher/marks/1
+Authorization: Bearer {{token}}
+
+### Grade Individual Answer (for short/long questions)
+PUT {{baseUrl}}/teacher/grade/answer/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marks_obtained": 4
+}
+
+### Finalize Grading for Attempt
+POST {{baseUrl}}/teacher/grade/finalize/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### RESULTS & GRADES APIs (Admin)
+### ========================================
+
+### Get Grade Scale
+GET {{baseUrl}}/admin/grade-scale
+Authorization: Bearer {{token}}
+
+### Update Grade Scale
+PUT {{baseUrl}}/admin/grade-scale
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scale": [
+    { "min_marks": 85, "max_marks": 100, "grade": "A+", "grade_point": 4.00 },
+    { "min_marks": 80, "max_marks": 84.99, "grade": "A", "grade_point": 4.00 },
+    { "min_marks": 75, "max_marks": 79.99, "grade": "B+", "grade_point": 3.50 },
+    { "min_marks": 70, "max_marks": 74.99, "grade": "B", "grade_point": 3.00 },
+    { "min_marks": 65, "max_marks": 69.99, "grade": "C+", "grade_point": 2.50 },
+    { "min_marks": 60, "max_marks": 64.99, "grade": "C", "grade_point": 2.00 },
+    { "min_marks": 55, "max_marks": 59.99, "grade": "D+", "grade_point": 1.50 },
+    { "min_marks": 50, "max_marks": 54.99, "grade": "D", "grade_point": 1.00 },
+    { "min_marks": 0, "max_marks": 49.99, "grade": "F", "grade_point": 0.00 }
+  ]
+}
+
+### Calculate Grades for a Course
+POST {{baseUrl}}/admin/calculate-grades
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "course_id": 1,
+  "semester_id": 1
+}
+
+### Calculate Grades for All Courses in Semester
+POST {{baseUrl}}/admin/calculate-semester-grades
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "semester_id": 1
+}
+
+### Calculate GPA for All Students in Semester
+POST {{baseUrl}}/admin/calculate-gpa
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "semester_id": 1
+}
+
+### Get Student CGPA
+GET {{baseUrl}}/admin/student/1/cgpa
+Authorization: Bearer {{token}}
+
+### Process Results (Pass/Fail, Probation)
+POST {{baseUrl}}/admin/process-results
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "semester_id": 1,
+  "passing_cgpa": 2.0,
+  "probation_cgpa": 1.5
+}
+
+### Promote Students to Next Semester
+POST {{baseUrl}}/admin/promote-students
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "semester_id": 1,
+  "next_semester_id": 2
+}
+
+### Publish Results
+POST {{baseUrl}}/admin/publish-results
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "semester_id": 1,
+  "notify_students": true
+}
+
+### Freeze Results (Prevent Changes)
+POST {{baseUrl}}/admin/freeze-results
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "semester_id": 1
+}
+
+### Get Class Result Summary
+GET {{baseUrl}}/admin/class-summary?semester_id=1
+Authorization: Bearer {{token}}
+
+### Get Class Result Summary by Department
+GET {{baseUrl}}/admin/class-summary?semester_id=1&department_id=1
+Authorization: Bearer {{token}}
+
+### Get Toppers List
+GET {{baseUrl}}/admin/toppers?semester_id=1&limit=10
+Authorization: Bearer {{token}}
+
+### View Student Results (Admin)
+GET {{baseUrl}}/admin/student/1
+Authorization: Bearer {{token}}
+
+### View Student Semester Results (Admin)
+GET {{baseUrl}}/admin/student/1/semester/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### RESULTS APIs (Student)
+### ========================================
+
+### Get My Results (All Semesters)
+GET {{baseUrl}}/student/results
+Authorization: Bearer {{token}}
+
+### Get My Semester Results
+GET {{baseUrl}}/student/results/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### MARKSHEET, TRANSCRIPT & DEGREE AUDIT APIs
+### ========================================
+
+### ==================== STUDENT MARKSHEET ====================
+
+### Get Semester Marksheet
+GET {{baseUrl}}/student/marksheet/1
+Authorization: Bearer {{token}}
+
+### Download Marksheet PDF
+GET {{baseUrl}}/student/marksheet/download/1
+Authorization: Bearer {{token}}
+
+### ==================== STUDENT TRANSCRIPT ====================
+
+### Request Transcript
+POST {{baseUrl}}/student/request-transcript
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "purpose": "Higher Studies Abroad",
+  "copies": 2,
+  "delivery_type": "pickup"
+}
+
+### Get My Transcript Requests
+GET {{baseUrl}}/student/transcript-requests
+Authorization: Bearer {{token}}
+
+### Get My Issued Transcripts
+GET {{baseUrl}}/student/transcripts
+Authorization: Bearer {{token}}
+
+### Download Transcript PDF
+GET {{baseUrl}}/student/transcript/download
+Authorization: Bearer {{token}}
+
+### Download Specific Transcript PDF
+GET {{baseUrl}}/student/transcript/download/1
+Authorization: Bearer {{token}}
+
+### ==================== STUDENT DEGREE AUDIT ====================
+
+### Get Degree Audit (Complete Analysis)
+GET {{baseUrl}}/student/degree-audit
+Authorization: Bearer {{token}}
+
+### Get Progress Summary
+GET {{baseUrl}}/student/progress
+Authorization: Bearer {{token}}
+
+### ==================== ADMIN TRANSCRIPT MANAGEMENT ====================
+
+### Get All Transcript Requests
+GET {{baseUrl}}/admin/transcript-requests
+Authorization: Bearer {{token}}
+
+### Get Pending Transcript Requests
+GET {{baseUrl}}/admin/transcript-requests?status=pending
+Authorization: Bearer {{token}}
+
+### Approve Transcript Request
+POST {{baseUrl}}/admin/approve-transcript/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "remarks": "Transcript approved for higher studies"
+}
+
+### Reject Transcript Request
+POST {{baseUrl}}/admin/reject-transcript/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "remarks": "Incomplete documentation"
+}
+
+### View Student Transcript Data (Admin)
+GET {{baseUrl}}/admin/student/1/transcript-data
+Authorization: Bearer {{token}}
+
+### View Student Transcripts (Admin)
+GET {{baseUrl}}/admin/student/1/transcripts
+Authorization: Bearer {{token}}
+
+### View Student Marksheet (Admin)
+GET {{baseUrl}}/admin/student/1/marksheet/1
+Authorization: Bearer {{token}}
+
+### Download Student Marksheet (Admin)
+GET {{baseUrl}}/admin/student/1/marksheet/download/1
+Authorization: Bearer {{token}}
+
+### View Student Degree Audit (Admin)
+GET {{baseUrl}}/admin/student/1/degree-audit
+Authorization: Bearer {{token}}
+
+### View Student Progress (Admin)
+GET {{baseUrl}}/admin/student/1/progress
+Authorization: Bearer {{token}}
+
+### Download Student Transcript (Admin)
+GET {{baseUrl}}/admin/student/1/transcript/download
+Authorization: Bearer {{token}}
+
+### ==================== PUBLIC VERIFICATION ====================
+
+### Verify Transcript (No Auth Required)
+GET {{baseUrl}}/verify-transcript/GCL-ABC123-XYZ789

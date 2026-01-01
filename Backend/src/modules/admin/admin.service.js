@@ -1002,7 +1002,7 @@ class AdminService {
       `INSERT INTO courses (code, name, description, credit_hours, department_id, semester_number)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [code, name, description, credit_hours || 3, department_id, semesterData.semester_number || null]
+      [code, name, description, credit_hours || 3, department_id, semester_number || null]
     );
 
     await this.logActivity(createdBy, 'CREATE_COURSE', 'admin', { courseId: result.rows[0].id, code, name });
@@ -1060,18 +1060,18 @@ class AdminService {
                WHERE cp.course_id = c.id
               ) as prerequisites,
               (SELECT json_agg(json_build_object(
-                'id', co.id,
+                'id', cs.id,
                 'semester_name', sem.name,
                 'teacher_name', t.name,
-                'section', co.section_name
+                'section', cs.section_name
               ))
-               FROM course_offerings co
-               JOIN semesters sem ON co.semester_id = sem.id
-               LEFT JOIN teachers t ON co.teacher_id = t.id
-               WHERE co.course_id = c.id
+               FROM course_sections cs
+               JOIN semesters sem ON cs.semester_id = sem.id
+               LEFT JOIN teachers t ON cs.teacher_id = t.id
+               WHERE cs.course_id = c.id
                ORDER BY sem.start_date DESC
                LIMIT 5
-              ) as recent_offerings
+              ) as recent_sections
        FROM courses c
        LEFT JOIN departments d ON c.department_id = d.id
        WHERE c.id = $1`,
@@ -1086,7 +1086,7 @@ class AdminService {
   }
 
   async updateCourse(courseId, updateData, updatedBy) {
-    const { code, name, description, credit_hours, department_id, course_type, lecture_hours, lab_hours, is_active } = updateData;
+    const { code, name, description, credit_hours, department_id, semester_number, is_active } = updateData;
 
     // Check if new code already exists (if changing)
     if (code) {
@@ -1103,13 +1103,11 @@ class AdminService {
        description = COALESCE($3, description),
        credit_hours = COALESCE($4, credit_hours),
        department_id = COALESCE($5, department_id),
-       course_type = COALESCE($6, course_type),
-       lecture_hours = COALESCE($7, lecture_hours),
-       lab_hours = COALESCE($8, lab_hours),
-       is_active = COALESCE($9, is_active)
-       WHERE id = $10
+       semester_number = COALESCE($6, semester_number),
+       is_active = COALESCE($7, is_active)
+       WHERE id = $8
        RETURNING *`,
-      [code, name, description, credit_hours, department_id, course_type, lecture_hours, lab_hours, is_active, courseId]
+      [code, name, description, credit_hours, department_id, semester_number, is_active, courseId]
     );
 
     if (result.rows.length === 0) {
@@ -1122,11 +1120,11 @@ class AdminService {
   }
 
   async deleteCourse(courseId, permanent, deletedBy) {
-    // Check if course has offerings
-    const hasOfferings = await query('SELECT id FROM course_offerings WHERE course_id = $1 LIMIT 1', [courseId]);
+    // Check if course has sections
+    const hasSections = await query('SELECT id FROM course_sections WHERE course_id = $1 LIMIT 1', [courseId]);
     
-    if (hasOfferings.rows.length > 0 && permanent) {
-      throw { status: 400, message: 'Cannot permanently delete course with existing offerings. Deactivate instead.' };
+    if (hasSections.rows.length > 0 && permanent) {
+      throw { status: 400, message: 'Cannot permanently delete course with existing sections. Deactivate instead.' };
     }
 
     let result;

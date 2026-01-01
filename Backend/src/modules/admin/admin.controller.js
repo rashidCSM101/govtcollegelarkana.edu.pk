@@ -412,7 +412,6 @@ class AdminController {
     try {
       const filters = {
         session_id: req.query.session_id,
-        is_current: req.query.is_current === 'true' ? true : (req.query.is_current === 'false' ? false : undefined),
         is_active: req.query.is_active === 'true' ? true : (req.query.is_active === 'false' ? false : undefined)
       };
       const semesters = await adminService.getSemesters(filters);
@@ -473,7 +472,6 @@ class AdminController {
     try {
       const filters = {
         department_id: req.query.department_id,
-        course_type: req.query.course_type,
         is_active: req.query.is_active === 'true' ? true : (req.query.is_active === 'false' ? false : undefined),
         search: req.query.search
       };

@@ -1,0 +1,88 @@
+const express = require('express');
+const router = express.Router();
+const { authMiddleware } = require('../../middleware/auth.middleware');
+const { teacherOnly, teacherOrAdmin } = require('../../middleware/role.middleware');
+const timetableController = require('../timetable/timetable.controller');
+const attendanceController = require('../attendance/attendance.controller');
+const examController = require('../exam/exam.controller');
+const resultController = require('../result/result.controller');
+const reEvaluationController = require('../re-evaluation/re-evaluation.controller');
+
+// All routes require authentication
+router.use(authMiddleware);
+
+// ==================== TIMETABLE ROUTE (Teacher) ====================
+router.get('/timetable', teacherOnly, timetableController.getTeacherTimetable.bind(timetableController));
+
+// ==================== ATTENDANCE ROUTES (Teacher) ====================
+
+// Mark single attendance
+router.post('/attendance/mark', teacherOnly, attendanceController.markAttendance.bind(attendanceController));
+
+// Bulk mark attendance
+router.post('/attendance/bulk-mark', teacherOnly, attendanceController.bulkMarkAttendance.bind(attendanceController));
+
+// Edit attendance
+router.put('/attendance/edit/:id', teacherOnly, attendanceController.editAttendance.bind(attendanceController));
+
+// Get students for marking attendance
+router.get('/attendance/students', teacherOnly, attendanceController.getStudentsForAttendance.bind(attendanceController));
+
+// Get section attendance
+router.get('/attendance/section/:sectionId', teacherOnly, attendanceController.getSectionAttendance.bind(attendanceController));
+
+// ==================== ONLINE EXAM ROUTES (Teacher) ====================
+
+// Create online exam
+router.post('/online-exam', teacherOrAdmin, examController.createOnlineExam.bind(examController));
+
+// Add questions to online exam
+router.post('/online-exam/:id/questions', teacherOrAdmin, examController.addQuestions.bind(examController));
+
+// Get online exam with questions
+router.get('/online-exam/:id', teacherOrAdmin, examController.getOnlineExamQuestions.bind(examController));
+
+// Update question
+router.put('/online-exam/question/:questionId', teacherOrAdmin, examController.updateQuestion.bind(examController));
+
+// Delete question
+router.delete('/online-exam/question/:questionId', teacherOrAdmin, examController.deleteQuestion.bind(examController));
+
+// Activate/Deactivate online exam
+router.patch('/online-exam/:id/toggle', teacherOrAdmin, examController.toggleOnlineExam.bind(examController));
+
+// ==================== MARKS ENTRY (Teacher) ====================
+
+// Enter marks
+router.post('/marks/enter', teacherOrAdmin, examController.enterMarks.bind(examController));
+
+// Edit marks
+router.put('/marks/edit/:id', teacherOrAdmin, resultController.editMarks.bind(resultController));
+
+// Bulk enter marks
+router.post('/marks/bulk-enter', teacherOrAdmin, examController.bulkEnterMarks.bind(examController));
+
+// Bulk upload marks from CSV
+router.post('/marks/bulk-upload', teacherOrAdmin, resultController.bulkUploadMarks.bind(resultController));
+
+// Lock marks
+router.post('/marks/lock', teacherOrAdmin, resultController.lockMarks.bind(resultController));
+
+// Get marks for exam
+router.get('/marks/:examId', teacherOrAdmin, examController.getExamMarks.bind(examController));
+
+// Grade individual answer
+router.put('/grade/answer/:answerId', teacherOrAdmin, examController.gradeAnswer.bind(examController));
+
+// Finalize grading
+router.post('/grade/finalize/:attemptId', teacherOrAdmin, examController.finalizeGrading.bind(examController));
+
+// ==================== RE-EVALUATION ROUTES (Teacher) ====================
+
+// Get assigned re-evaluation requests
+router.get('/re-evaluation/requests', teacherOnly, reEvaluationController.getAssignedRequests.bind(reEvaluationController));
+
+// Update re-evaluation result
+router.post('/re-evaluation/requests/:requestId/update', teacherOnly, reEvaluationController.updateResult.bind(reEvaluationController));
+
+module.exports = router;

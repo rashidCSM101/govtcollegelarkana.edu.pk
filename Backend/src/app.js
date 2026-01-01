@@ -28,14 +28,21 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/auth', require('./modules/auth/auth.routes'));
 app.use('/api/admin', require('./modules/admin/admin.routes'));
-// app.use('/api/students', require('./modules/student/student.routes'));
-// app.use('/api/teachers', require('./modules/teacher/teacher.routes'));
-// app.use('/api/admin', require('./modules/admin/admin.routes'));
-// app.use('/api/attendance', require('./modules/attendance/attendance.routes'));
-// app.use('/api/exams', require('./modules/exam/exam.routes'));
+app.use('/api/student', require('./modules/student/student.routes'));
+app.use('/api/teacher', require('./modules/teacher/teacher.routes'));
+app.use('/api/timetable', require('./modules/timetable/timetable.routes'));
+app.use('/api/admin/attendance', require('./modules/attendance/attendance.routes'));
+app.use('/api/admin', require('./modules/exam/exam.routes'));
+app.use('/api/admin', require('./modules/result/result.routes'));
+app.use('/api/admin', require('./modules/transcript/transcript.routes'));
+app.use('/api/admin/re-evaluation', require('./modules/re-evaluation/re-evaluation.routes'));
+
+// Public transcript verification route (no auth required)
+const transcriptController = require('./modules/transcript/transcript.controller');
+app.get('/api/verify-transcript/:code', transcriptController.verifyTranscript.bind(transcriptController));
+
 // app.use('/api/fees', require('./modules/fee/fee.routes'));
 // app.use('/api/assignments', require('./modules/assignment/assignment.routes'));
-// app.use('/api/timetable', require('./modules/timetable/timetable.routes'));
 // app.use('/api/certificates', require('./modules/certificate/certificate.routes'));
 // app.use('/api/notices', require('./modules/notice/notice.routes'));
 // app.use('/api/reports', require('./modules/report/report.routes'));

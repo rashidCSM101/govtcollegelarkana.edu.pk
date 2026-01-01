@@ -33,8 +33,17 @@ const checkRole = (...allowedRoles) => {
 // Admin only middleware
 const adminOnly = checkRole(ROLES.ADMIN);
 
+// Teacher only middleware
+const teacherOnly = checkRole(ROLES.TEACHER);
+
+// Student only middleware
+const studentOnly = checkRole(ROLES.STUDENT);
+
 // Teacher or Admin middleware
 const teacherOrAdmin = checkRole(ROLES.ADMIN, ROLES.TEACHER);
+
+// Student or Admin middleware
+const studentOrAdmin = checkRole(ROLES.ADMIN, ROLES.STUDENT);
 
 // Student, Teacher, or Admin middleware
 const authenticated = checkRole(ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT, ROLES.STAFF);
@@ -43,6 +52,9 @@ module.exports = {
   ROLES,
   checkRole,
   adminOnly,
+  teacherOnly,
+  studentOnly,
   teacherOrAdmin,
+  studentOrAdmin,
   authenticated
 };
