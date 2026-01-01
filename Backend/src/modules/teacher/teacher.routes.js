@@ -9,6 +9,7 @@ const resultController = require('../result/result.controller');
 const reEvaluationController = require('../re-evaluation/re-evaluation.controller');
 const assignmentController = require('../assignment/assignment.controller');
 const leaveController = require('../leave/leave.controller');
+const notificationController = require('../notification/notification.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -129,5 +130,9 @@ router.post('/leave/approve/:id', teacherOnly, leaveController.approveLeave.bind
 
 // Reject student leave
 router.post('/leave/reject/:id', teacherOnly, leaveController.rejectLeave.bind(leaveController));
+
+// ==================== NOTIFICATION PREFERENCES ROUTES (Teacher) ====================
+router.get('/notification-preferences', teacherOnly, notificationController.getPreferences.bind(notificationController));
+router.put('/notification-preferences', teacherOnly, notificationController.updatePreferences.bind(notificationController));
 
 module.exports = router;

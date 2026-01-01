@@ -38,6 +38,8 @@ app.use('/api/admin', require('./modules/transcript/transcript.routes'));
 app.use('/api/admin/re-evaluation', require('./modules/re-evaluation/re-evaluation.routes'));
 app.use('/api/admin', require('./modules/fee/fee.routes'));
 app.use('/api/admission', require('./modules/admission/admission.routes'));
+app.use('/api/notices', require('./routes/notice.routes'));
+app.use('/api/notifications', require('./routes/notification.routes'));
 
 // Public routes (no auth required)
 app.use('/api/public', require('./routes/public.routes'));

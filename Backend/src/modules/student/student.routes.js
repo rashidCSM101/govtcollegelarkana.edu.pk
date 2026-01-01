@@ -14,6 +14,7 @@ const assignmentController = require('../assignment/assignment.controller');
 const leaveController = require('../leave/leave.controller');
 const certificateController = require('../certificate/certificate.controller');
 const feedbackController = require('../feedback/feedback.controller');
+const notificationController = require('../notification/notification.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -104,6 +105,10 @@ router.get('/certificate/requests', studentOnly, certificateController.getStuden
 // ==================== FEEDBACK ROUTES (Student) ====================
 router.get('/feedback-forms', studentOnly, feedbackController.getAvailableFeedbackForms.bind(feedbackController));
 router.post('/feedback/submit', studentOnly, feedbackController.submitFeedback.bind(feedbackController));
+
+// ==================== NOTIFICATION PREFERENCES ROUTES (Student) ====================
+router.get('/notification-preferences', studentOnly, notificationController.getPreferences.bind(notificationController));
+router.put('/notification-preferences', studentOnly, notificationController.updatePreferences.bind(notificationController));
 
 // ==================== COURSE SECTIONS ROUTES (Admin) ====================
 router.post('/sections', adminOnly, studentController.createSection);

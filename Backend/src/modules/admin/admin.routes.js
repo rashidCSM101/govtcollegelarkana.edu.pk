@@ -4,6 +4,8 @@ const adminController = require('./admin.controller');
 const leaveController = require('../leave/leave.controller');
 const certificateController = require('../certificate/certificate.controller');
 const feedbackController = require('../feedback/feedback.controller');
+const noticeController = require('../notice/notice.controller');
+const notificationController = require('../notification/notification.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -112,5 +114,23 @@ router.get('/feedback-forms', feedbackController.getAllFeedbackForms.bind(feedba
 
 // Get feedback reports
 router.get('/feedback-reports', feedbackController.getFeedbackReports.bind(feedbackController));
+
+// ==================== NOTICE ROUTES (Admin) ====================
+
+// Create notice
+router.post('/notices', noticeController.createNotice.bind(noticeController));
+
+// Get all notices (admin view)
+router.get('/notices', noticeController.getAllNoticesAdmin.bind(noticeController));
+
+// Update notice
+router.put('/notices/:id', noticeController.updateNotice.bind(noticeController));
+
+// Delete notice
+router.delete('/notices/:id', noticeController.deleteNotice.bind(noticeController));
+
+// ==================== NOTIFICATION PREFERENCES ROUTES (Admin) ====================
+router.get('/notification-preferences', notificationController.getPreferences.bind(notificationController));
+router.put('/notification-preferences', notificationController.updatePreferences.bind(notificationController));
 
 module.exports = router;
