@@ -8,6 +8,7 @@ const noticeController = require('../notice/notice.controller');
 const notificationController = require('../notification/notification.controller');
 const documentController = require('../document/document.controller');
 const scholarshipController = require('../scholarship/scholarship.controller');
+const complaintController = require('../complaint/complaint.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -177,5 +178,28 @@ router.post('/scholarship/distribution/:applicationId', scholarshipController.pr
 
 // Get statistics
 router.get('/scholarship/statistics', scholarshipController.getStatistics.bind(scholarshipController));
+
+// ==================== COMPLAINT ROUTES (Admin) ====================
+
+// Get all complaints
+router.get('/complaints', complaintController.getAllComplaints.bind(complaintController));
+
+// Get complaint statistics (must be before :id route)
+router.get('/complaints/statistics', complaintController.getStatistics.bind(complaintController));
+
+// Get complaint by ID
+router.get('/complaints/:id', complaintController.getComplaintByIdAdmin.bind(complaintController));
+
+// Assign complaint
+router.post('/complaints/:id/assign', complaintController.assignComplaint.bind(complaintController));
+
+// Resolve complaint
+router.post('/complaints/:id/resolve', complaintController.resolveComplaint.bind(complaintController));
+
+// Update complaint status
+router.put('/complaints/:id/status', complaintController.updateStatus.bind(complaintController));
+
+// Add comment to complaint
+router.post('/complaints/:id/comment', complaintController.addCommentAdmin.bind(complaintController));
 
 module.exports = router;

@@ -17,6 +17,7 @@ const feedbackController = require('../feedback/feedback.controller');
 const notificationController = require('../notification/notification.controller');
 const documentController = require('../document/document.controller');
 const scholarshipController = require('../scholarship/scholarship.controller');
+const complaintController = require('../complaint/complaint.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -122,6 +123,12 @@ router.get('/documents/download/:id', studentOnly, documentController.downloadDo
 router.get('/scholarships', studentOnly, scholarshipController.getAvailableScholarships.bind(scholarshipController));
 router.post('/scholarship/apply', studentOnly, scholarshipController.applyForScholarship.bind(scholarshipController));
 router.get('/scholarship/status', studentOnly, scholarshipController.getApplicationStatus.bind(scholarshipController));
+
+// ==================== COMPLAINT ROUTES (Student) ====================
+router.post('/complaints', studentOnly, complaintController.uploadMiddleware, complaintController.submitComplaint.bind(complaintController));
+router.get('/complaints', studentOnly, complaintController.getStudentComplaints.bind(complaintController));
+router.get('/complaints/:id', studentOnly, complaintController.getComplaintDetails.bind(complaintController));
+router.post('/complaints/:id/comment', studentOnly, complaintController.addComment.bind(complaintController));
 
 // ==================== COURSE SECTIONS ROUTES (Admin) ====================
 router.post('/sections', adminOnly, studentController.createSection);
