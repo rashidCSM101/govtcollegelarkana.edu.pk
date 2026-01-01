@@ -40,6 +40,7 @@ app.use('/api/admin', require('./modules/fee/fee.routes'));
 app.use('/api/admission', require('./modules/admission/admission.routes'));
 app.use('/api/notices', require('./routes/notice.routes'));
 app.use('/api/notifications', require('./routes/notification.routes'));
+app.use('/api/calendar', require('./routes/calendar.routes'));
 
 // Public routes (no auth required)
 app.use('/api/public', require('./routes/public.routes'));

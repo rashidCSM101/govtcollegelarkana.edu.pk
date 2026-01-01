@@ -9,6 +9,7 @@ const notificationController = require('../notification/notification.controller'
 const documentController = require('../document/document.controller');
 const scholarshipController = require('../scholarship/scholarship.controller');
 const complaintController = require('../complaint/complaint.controller');
+const calendarController = require('../calendar/calendar.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -201,5 +202,25 @@ router.put('/complaints/:id/status', complaintController.updateStatus.bind(compl
 
 // Add comment to complaint
 router.post('/complaints/:id/comment', complaintController.addCommentAdmin.bind(complaintController));
+
+// ==================== CALENDAR ROUTES (Admin) ====================
+
+// Create event
+router.post('/calendar/events', calendarController.createEvent.bind(calendarController));
+
+// Get calendar statistics (must be before :id route)
+router.get('/calendar/statistics', calendarController.getStatistics.bind(calendarController));
+
+// Get all events
+router.get('/calendar/events', calendarController.getAllEvents.bind(calendarController));
+
+// Get event by ID
+router.get('/calendar/events/:id', calendarController.getEventById.bind(calendarController));
+
+// Update event
+router.put('/calendar/events/:id', calendarController.updateEvent.bind(calendarController));
+
+// Delete event
+router.delete('/calendar/events/:id', calendarController.deleteEvent.bind(calendarController));
 
 module.exports = router;
