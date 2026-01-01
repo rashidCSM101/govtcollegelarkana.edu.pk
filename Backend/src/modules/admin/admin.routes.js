@@ -12,6 +12,7 @@ const complaintController = require('../complaint/complaint.controller');
 const calendarController = require('../calendar/calendar.controller');
 const idcardController = require('../idcard/idcard.controller');
 const reportController = require('../report/report.controller');
+const dashboardController = require('../dashboard/dashboard.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -35,7 +36,7 @@ router.use(authMiddleware);
 router.use(adminOnly);
 
 // ==================== DASHBOARD ====================
-router.get('/dashboard', adminController.getDashboardStats);
+router.get('/dashboard', dashboardController.getAdminDashboard.bind(dashboardController));
 
 // ==================== STUDENT ROUTES ====================
 router.post('/students', adminController.addStudent);

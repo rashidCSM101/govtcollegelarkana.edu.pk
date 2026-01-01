@@ -19,9 +19,13 @@ const documentController = require('../document/document.controller');
 const scholarshipController = require('../scholarship/scholarship.controller');
 const complaintController = require('../complaint/complaint.controller');
 const idcardController = require('../idcard/idcard.controller');
+const dashboardController = require('../dashboard/dashboard.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
+
+// ==================== DASHBOARD ====================
+router.get('/dashboard', studentOnly, dashboardController.getStudentDashboard.bind(dashboardController));
 
 // ==================== TIMETABLE ROUTE (Student) ====================
 router.get('/timetable', studentOnly, timetableController.getStudentTimetable.bind(timetableController));

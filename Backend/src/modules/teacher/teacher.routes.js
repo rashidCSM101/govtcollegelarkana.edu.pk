@@ -10,9 +10,13 @@ const reEvaluationController = require('../re-evaluation/re-evaluation.controlle
 const assignmentController = require('../assignment/assignment.controller');
 const leaveController = require('../leave/leave.controller');
 const notificationController = require('../notification/notification.controller');
+const dashboardController = require('../dashboard/dashboard.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
+
+// ==================== DASHBOARD ====================
+router.get('/dashboard', teacherOnly, dashboardController.getTeacherDashboard.bind(dashboardController));
 
 // ==================== TIMETABLE ROUTE (Teacher) ====================
 router.get('/timetable', teacherOnly, timetableController.getTeacherTimetable.bind(timetableController));
