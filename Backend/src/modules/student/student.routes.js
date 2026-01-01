@@ -9,6 +9,7 @@ const examController = require('../exam/exam.controller');
 const resultController = require('../result/result.controller');
 const transcriptController = require('../transcript/transcript.controller');
 const reEvaluationController = require('../re-evaluation/re-evaluation.controller');
+const feeController = require('../fee/fee.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -54,6 +55,15 @@ router.post('/re-evaluation/request', studentOnly, reEvaluationController.submit
 router.post('/re-evaluation/requests/:requestId/pay', studentOnly, reEvaluationController.payFee.bind(reEvaluationController));
 router.get('/re-evaluation/requests', studentOnly, reEvaluationController.getStudentRequests.bind(reEvaluationController));
 router.get('/re-evaluation/requests/:requestId/status', studentOnly, reEvaluationController.getRequestStatus.bind(reEvaluationController));
+
+// ==================== FEE ROUTES (Student) ====================
+router.get('/fees', studentOnly, feeController.getStudentFees.bind(feeController));
+router.get('/fee-history', studentOnly, feeController.getFeeHistory.bind(feeController));
+router.get('/voucher/:feeId', studentOnly, feeController.getVoucher.bind(feeController));
+router.get('/voucher/:feeId/download', studentOnly, feeController.downloadVoucher.bind(feeController));
+router.post('/pay-online', studentOnly, feeController.payOnline.bind(feeController));
+router.get('/receipts', studentOnly, feeController.getReceipts.bind(feeController));
+router.get('/receipt/:id/download', studentOnly, feeController.downloadReceipt.bind(feeController));
 
 // ==================== ENROLLMENT ROUTES (Student) ====================
 router.post('/enroll', studentOnly, studentController.enrollInSemester);

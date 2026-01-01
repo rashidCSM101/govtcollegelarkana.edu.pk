@@ -36,10 +36,15 @@ app.use('/api/admin', require('./modules/exam/exam.routes'));
 app.use('/api/admin', require('./modules/result/result.routes'));
 app.use('/api/admin', require('./modules/transcript/transcript.routes'));
 app.use('/api/admin/re-evaluation', require('./modules/re-evaluation/re-evaluation.routes'));
+app.use('/api/admin', require('./modules/fee/fee.routes'));
 
 // Public transcript verification route (no auth required)
 const transcriptController = require('./modules/transcript/transcript.controller');
 app.get('/api/verify-transcript/:code', transcriptController.verifyTranscript.bind(transcriptController));
+
+// Public payment verification route (no auth required)
+const feeController = require('./modules/fee/fee.controller');
+app.post('/api/payment/verify/:transactionId', feeController.verifyPayment.bind(feeController));
 
 // app.use('/api/fees', require('./modules/fee/fee.routes'));
 // app.use('/api/assignments', require('./modules/assignment/assignment.routes'));

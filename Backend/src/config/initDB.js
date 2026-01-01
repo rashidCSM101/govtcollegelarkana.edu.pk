@@ -483,8 +483,12 @@ const initDatabase = async () => {
           lab_fee DECIMAL(10,2) DEFAULT 0,
           library_fee DECIMAL(10,2) DEFAULT 0,
           sports_fee DECIMAL(10,2) DEFAULT 0,
+          exam_fee DECIMAL(10,2) DEFAULT 0,
+          admission_fee DECIMAL(10,2) DEFAULT 0,
           other_fee DECIMAL(10,2) DEFAULT 0,
           total_fee DECIMAL(10,2) DEFAULT 0,
+          late_fee_per_day DECIMAL(10,2) DEFAULT 50.00,
+          description TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -501,6 +505,7 @@ const initDatabase = async () => {
           due_amount DECIMAL(10,2),
           due_date DATE,
           status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'partial', 'paid', 'overdue')),
+          remarks TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -530,7 +535,8 @@ const initDatabase = async () => {
           bank_name VARCHAR(100),
           issue_date DATE DEFAULT CURRENT_DATE,
           valid_until DATE,
-          status VARCHAR(20) DEFAULT 'issued' CHECK (status IN ('issued', 'paid', 'expired', 'cancelled'))
+          status VARCHAR(20) DEFAULT 'issued' CHECK (status IN ('issued', 'paid', 'expired', 'cancelled')),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
       -- =====================================================
