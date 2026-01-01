@@ -18,6 +18,7 @@ const notificationController = require('../notification/notification.controller'
 const documentController = require('../document/document.controller');
 const scholarshipController = require('../scholarship/scholarship.controller');
 const complaintController = require('../complaint/complaint.controller');
+const idcardController = require('../idcard/idcard.controller');
 
 // All routes require authentication
 router.use(authMiddleware);
@@ -129,6 +130,10 @@ router.post('/complaints', studentOnly, complaintController.uploadMiddleware, co
 router.get('/complaints', studentOnly, complaintController.getStudentComplaints.bind(complaintController));
 router.get('/complaints/:id', studentOnly, complaintController.getComplaintDetails.bind(complaintController));
 router.post('/complaints/:id/comment', studentOnly, complaintController.addComment.bind(complaintController));
+
+// ==================== ID CARD ROUTES (Student) ====================
+router.get('/id-card', studentOnly, idcardController.getStudentIDCard.bind(idcardController));
+router.get('/id-card/download', studentOnly, idcardController.downloadIDCard.bind(idcardController));
 
 // ==================== COURSE SECTIONS ROUTES (Admin) ====================
 router.post('/sections', adminOnly, studentController.createSection);

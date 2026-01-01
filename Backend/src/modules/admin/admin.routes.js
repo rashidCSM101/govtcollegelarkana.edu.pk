@@ -10,6 +10,7 @@ const documentController = require('../document/document.controller');
 const scholarshipController = require('../scholarship/scholarship.controller');
 const complaintController = require('../complaint/complaint.controller');
 const calendarController = require('../calendar/calendar.controller');
+const idcardController = require('../idcard/idcard.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -222,5 +223,22 @@ router.put('/calendar/events/:id', calendarController.updateEvent.bind(calendarC
 
 // Delete event
 router.delete('/calendar/events/:id', calendarController.deleteEvent.bind(calendarController));
+
+// ==================== ID CARD ROUTES (Admin) ====================
+
+// Generate ID cards
+router.post('/generate-id-cards', idcardController.generateIDCards.bind(idcardController));
+
+// Verify ID card by QR code
+router.get('/verify-id-card/:qrCode', idcardController.verifyIDCard.bind(idcardController));
+
+// Get all ID cards
+router.get('/id-cards', idcardController.getAllIDCards.bind(idcardController));
+
+// Get ID card statistics
+router.get('/id-cards/statistics', idcardController.getStatistics.bind(idcardController));
+
+// Download ID card (Admin)
+router.get('/id-card/download/:studentId', idcardController.downloadIDCardAdmin.bind(idcardController));
 
 module.exports = router;
