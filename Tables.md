@@ -47,37 +47,40 @@
 32. fee_payments (id, student_fee_id, amount, payment_method, transaction_id, payment_date, receipt_no, received_by)
 33. fee_vouchers (id, student_id, student_fee_id, voucher_no, bank_name, issue_date, valid_until, status)
 
+-- Admission Management
+34. admission_applications (id, application_no, full_name, father_name, mother_name, dob, gender, cnic, phone, email, address, city, province, previous_qualification, obtained_marks, total_marks, percentage, program_id, photo_path, documents, status, merit_score, merit_position, application_date, reviewed_by, approved_by, admission_date)
+
 -- Assignments
-34. assignments (id, course_id, section_id, title, description, total_marks, due_date, file_path, created_by, created_at)
-35. assignment_submissions (id, assignment_id, student_id, submission_text, file_path, submitted_at, marks_obtained, graded_by, graded_at, feedback)
+35. assignments (id, course_id, section_id, title, description, total_marks, due_date, file_path, created_by, created_at)
+36. assignment_submissions (id, assignment_id, student_id, submission_text, file_path, submitted_at, marks_obtained, graded_by, graded_at, feedback)
 
 -- Leave Management
-36. leave_applications (id, student_id, leave_type, from_date, to_date, reason, document_path, application_date, status, approved_by, approved_at, remarks)
-37. teacher_leaves (id, teacher_id, leave_type, from_date, to_date, reason, status, approved_by)
+37. leave_applications (id, student_id, leave_type, from_date, to_date, reason, document_path, application_date, status, approved_by, approved_at, remarks)
+38. teacher_leaves (id, teacher_id, leave_type, from_date, to_date, reason, status, approved_by)
 
 -- Certificates & Documents
-38. certificates (id, student_id, certificate_type, issue_date, certificate_no, issued_by, file_path, status)
-39. document_verifications (id, student_id, document_type, document_path, uploaded_at, verified_by, verified_at, status, remarks)
+39. certificates (id, student_id, certificate_type, issue_date, certificate_no, issued_by, file_path, status)
+40. document_verifications (id, student_id, document_type, document_path, uploaded_at, verified_by, verified_at, status, remarks)
 
 -- Notice & Communication
-40. notices (id, title, content, notice_type, priority, target_audience, department_id, published_by, published_at, expiry_date, attachments)
-41. notice_reads (id, notice_id, user_id, read_at)
+41. notices (id, title, content, notice_type, priority, target_audience, department_id, published_by, published_at, expiry_date, attachments)
+42. notice_reads (id, notice_id, user_id, read_at)
 
 -- Feedback & Surveys
-42. feedback_forms (id, title, type, target_role, semester_id, questions, is_active, created_by, created_at)
-43. feedback_responses (id, form_id, student_id, teacher_id, course_id, responses, submitted_at)
+43. feedback_forms (id, title, type, target_role, semester_id, questions, is_active, created_by, created_at)
+44. feedback_responses (id, form_id, student_id, teacher_id, course_id, responses, submitted_at)
 
 -- Scholarship
-44. scholarships (id, name, description, eligibility_criteria, amount, type, available_seats, application_start, application_end, status)
-45. scholarship_applications (id, scholarship_id, student_id, cgpa, documents, application_date, status, approved_by, approved_at)
+45. scholarships (id, name, description, eligibility_criteria, amount, type, available_seats, application_start, application_end, status)
+46. scholarship_applications (id, scholarship_id, student_id, cgpa, documents, application_date, status, approved_by, approved_at)
 
 -- Complaints & Grievances
-46. complaints (id, student_id, category, subject, description, priority, submitted_at, assigned_to, status, resolved_at, resolution)
+47. complaints (id, student_id, category, subject, description, priority, submitted_at, assigned_to, status, resolved_at, resolution)
 
 -- System Logs & Audit
-47. activity_logs (id, user_id, action, module, details, ip_address, timestamp)
-48. system_settings (id, key, value, description, updated_by, updated_at)
+48. activity_logs (id, user_id, action, module, details, ip_address, timestamp)
+49. system_settings (id, key, value, description, updated_by, updated_at)
 
 -- Notifications
-49. notifications (id, user_id, type, title, message, is_read, created_at)
-50. notification_preferences (id, user_id, email_enabled, sms_enabled, push_enabled)
+50. notifications (id, user_id, type, title, message, is_read, created_at)
+51. notification_preferences (id, user_id, email_enabled, sms_enabled, push_enabled)

@@ -37,6 +37,7 @@ app.use('/api/admin', require('./modules/result/result.routes'));
 app.use('/api/admin', require('./modules/transcript/transcript.routes'));
 app.use('/api/admin/re-evaluation', require('./modules/re-evaluation/re-evaluation.routes'));
 app.use('/api/admin', require('./modules/fee/fee.routes'));
+app.use('/api/admission', require('./modules/admission/admission.routes'));
 
 // Public transcript verification route (no auth required)
 const transcriptController = require('./modules/transcript/transcript.controller');

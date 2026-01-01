@@ -540,7 +540,66 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 34. ASSIGNMENTS TABLE
+      -- 34. ADMISSION APPLICATIONS TABLE
+      -- =====================================================
+      CREATE TABLE IF NOT EXISTS admission_applications (
+          id SERIAL PRIMARY KEY,
+          application_no VARCHAR(50) UNIQUE NOT NULL,
+          -- Personal Details
+          full_name VARCHAR(100) NOT NULL,
+          father_name VARCHAR(100) NOT NULL,
+          mother_name VARCHAR(100),
+          date_of_birth DATE NOT NULL,
+          gender VARCHAR(10) NOT NULL CHECK (gender IN ('male', 'female', 'other')),
+          cnic VARCHAR(20),
+          phone VARCHAR(20) NOT NULL,
+          email VARCHAR(100) NOT NULL,
+          address TEXT,
+          city VARCHAR(100),
+          province VARCHAR(100),
+          postal_code VARCHAR(20),
+          -- Academic Details
+          previous_qualification VARCHAR(50) NOT NULL,
+          previous_institution VARCHAR(200),
+          passing_year INTEGER,
+          obtained_marks DECIMAL(10,2) NOT NULL,
+          total_marks DECIMAL(10,2) NOT NULL,
+          percentage DECIMAL(5,2),
+          board_university VARCHAR(200),
+          -- Admission Details
+          program_id INTEGER REFERENCES departments(id),
+          preferred_shift VARCHAR(20) CHECK (preferred_shift IN ('morning', 'evening')),
+          -- Documents
+          photo_path VARCHAR(255),
+          cnic_path VARCHAR(255),
+          matric_certificate_path VARCHAR(255),
+          inter_certificate_path VARCHAR(255),
+          domicile_path VARCHAR(255),
+          -- Status & Tracking
+          status VARCHAR(30) DEFAULT 'submitted' CHECK (status IN ('submitted', 'under_review', 'approved', 'rejected', 'merit_list_published', 'admitted')),
+          application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          reviewed_by INTEGER REFERENCES users(id),
+          reviewed_at TIMESTAMP,
+          approved_by INTEGER REFERENCES users(id),
+          approved_at TIMESTAMP,
+          admission_date DATE,
+          -- Merit Information
+          merit_score DECIMAL(5,2),
+          merit_position INTEGER,
+          merit_list_date TIMESTAMP,
+          -- Additional
+          remarks TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Create index on application_no for faster lookups
+      CREATE INDEX IF NOT EXISTS idx_admission_applications_no ON admission_applications(application_no);
+      CREATE INDEX IF NOT EXISTS idx_admission_applications_status ON admission_applications(status);
+      CREATE INDEX IF NOT EXISTS idx_admission_applications_program ON admission_applications(program_id);
+      CREATE INDEX IF NOT EXISTS idx_admission_applications_merit ON admission_applications(merit_score DESC);
+
+      -- =====================================================
+      -- 35. ASSIGNMENTS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS assignments (
           id SERIAL PRIMARY KEY,
@@ -556,7 +615,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 35. ASSIGNMENT SUBMISSIONS TABLE
+      -- 36. ASSIGNMENT SUBMISSIONS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS assignment_submissions (
           id SERIAL PRIMARY KEY,
@@ -574,7 +633,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 36. LEAVE APPLICATIONS TABLE
+      -- 37. LEAVE APPLICATIONS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS leave_applications (
           id SERIAL PRIMARY KEY,
@@ -592,7 +651,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 37. TEACHER LEAVES TABLE
+      -- 38. TEACHER LEAVES TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS teacher_leaves (
           id SERIAL PRIMARY KEY,
@@ -607,7 +666,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 38. CERTIFICATES TABLE
+      -- 39. CERTIFICATES TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS certificates (
           id SERIAL PRIMARY KEY,
@@ -622,7 +681,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 39. DOCUMENT VERIFICATIONS TABLE
+      -- 40. DOCUMENT VERIFICATIONS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS document_verifications (
           id SERIAL PRIMARY KEY,
@@ -637,7 +696,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 40. NOTICES TABLE
+      -- 41. NOTICES TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS notices (
           id SERIAL PRIMARY KEY,
@@ -655,7 +714,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 41. NOTICE READS TABLE
+      -- 42. NOTICE READS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS notice_reads (
           id SERIAL PRIMARY KEY,
@@ -666,7 +725,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 42. FEEDBACK FORMS TABLE
+      -- 43. FEEDBACK FORMS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS feedback_forms (
           id SERIAL PRIMARY KEY,
@@ -681,7 +740,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 43. FEEDBACK RESPONSES TABLE
+      -- 44. FEEDBACK RESPONSES TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS feedback_responses (
           id SERIAL PRIMARY KEY,
@@ -694,7 +753,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 44. SCHOLARSHIPS TABLE
+      -- 45. SCHOLARSHIPS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS scholarships (
           id SERIAL PRIMARY KEY,
@@ -710,7 +769,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 45. SCHOLARSHIP APPLICATIONS TABLE
+      -- 46. SCHOLARSHIP APPLICATIONS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS scholarship_applications (
           id SERIAL PRIMARY KEY,
@@ -726,7 +785,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 46. COMPLAINTS TABLE
+      -- 47. COMPLAINTS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS complaints (
           id SERIAL PRIMARY KEY,
@@ -743,7 +802,7 @@ const initDatabase = async () => {
       );
 
       -- =====================================================
-      -- 47. ACTIVITY LOGS TABLE
+      -- 48. ACTIVITY LOGS TABLE
       -- =====================================================
       CREATE TABLE IF NOT EXISTS activity_logs (
           id SERIAL PRIMARY KEY,
