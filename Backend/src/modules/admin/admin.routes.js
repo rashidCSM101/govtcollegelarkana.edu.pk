@@ -11,6 +11,7 @@ const scholarshipController = require('../scholarship/scholarship.controller');
 const complaintController = require('../complaint/complaint.controller');
 const calendarController = require('../calendar/calendar.controller');
 const idcardController = require('../idcard/idcard.controller');
+const reportController = require('../report/report.controller');
 const { authMiddleware } = require('../../middleware/auth.middleware');
 const { adminOnly } = require('../../middleware/role.middleware');
 const multer = require('multer');
@@ -240,5 +241,25 @@ router.get('/id-cards/statistics', idcardController.getStatistics.bind(idcardCon
 
 // Download ID card (Admin)
 router.get('/id-card/download/:studentId', idcardController.downloadIDCardAdmin.bind(idcardController));
+
+// ==================== REPORT ROUTES ====================
+
+// Student reports
+router.get('/reports/students', reportController.getStudentReports.bind(reportController));
+
+// Attendance reports
+router.get('/reports/attendance', reportController.getAttendanceReports.bind(reportController));
+
+// Academic reports
+router.get('/reports/academic', reportController.getAcademicReports.bind(reportController));
+
+// Financial reports
+router.get('/reports/financial', reportController.getFinancialReports.bind(reportController));
+
+// Teacher reports
+router.get('/reports/teachers', reportController.getTeacherReports.bind(reportController));
+
+// Export report
+router.get('/reports/export/:type', reportController.exportReport.bind(reportController));
 
 module.exports = router;
