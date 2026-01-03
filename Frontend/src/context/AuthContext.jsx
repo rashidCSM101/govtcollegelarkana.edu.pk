@@ -13,6 +13,12 @@ export const AuthProvider = ({ children }) => {
     
     if (storedUser && token) {
       setUser(JSON.parse(storedUser));
+    } else {
+      // Set temporary admin user for testing
+      const tempUser = { name: 'Admin User', email: 'admin@gcl.edu.pk', role: 'admin' };
+      setUser(tempUser);
+      localStorage.setItem('user', JSON.stringify(tempUser));
+      localStorage.setItem('token', 'temp-token-123');
     }
     setLoading(false);
   }, []);

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const admissionController = require('./admission.controller');
-const { authenticate, authorize } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/auth.middleware');
 
 // ==================== PUBLIC ROUTES ====================
 

@@ -2,13 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './routes/ProtectedRoute';
+import MainLayout from './layouts/MainLayout';
 import TestTheme from './pages/TestTheme';
-
-// Import pages (to be created later)
-// import Login from './pages/Login';
-// import AdminDashboard from './pages/AdminDashboard';
-// import StudentDashboard from './pages/StudentDashboard';
-// import TeacherDashboard from './pages/TeacherDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import StudentList from './pages/admin/students/StudentList';
 
 function App() {
   return (
@@ -24,10 +21,122 @@ function App() {
 
             {/* Protected Routes - Admin */}
             <Route
-              path="/admin/*"
+              path="/admin"
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
-                  <div>Admin Dashboard</div>
+                  <MainLayout>
+                    <AdminDashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/students"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <StudentList />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/teachers"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Teacher Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/departments"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Department Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/courses"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Course Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/semesters"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Semester Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/fees"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Fee Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/exams"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Examination Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/results"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Result Processing</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/certificates"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Certificate Management</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>Reports & Analytics</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <MainLayout>
+                    <div>System Settings</div>
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

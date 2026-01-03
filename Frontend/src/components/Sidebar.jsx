@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   FiHome, FiUsers, FiBookOpen, FiDollarSign, FiFileText, 
@@ -7,8 +6,7 @@ import {
 } from 'react-icons/fi';
 import { HiOutlineAcademicCap } from 'react-icons/hi2';
 
-const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+const Sidebar = ({ collapsed, setCollapsed }) => {
 
   const menuItems = [
     { path: '/admin', icon: FiHome, label: 'Dashboard', exact: true },
