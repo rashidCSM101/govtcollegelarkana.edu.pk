@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit2, FiEye, FiTrash2, FiSearch, FiDownload, FiUpload } from 'react-icons/fi';
-import axiosInstance from '../../api/axios';
+import axiosInstance from '../../../api/axios';
 
 const StudentList = () => {
   const [students, setStudents] = useState([]);
