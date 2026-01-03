@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for Light Mode (Default) */
+:root {
+  /* Main Colors */
+  --color-dark: #111323;
+  --color-primary: #21CCEE;
+  --color-primary-light: #A5F0FC;
+  --color-primary-super-light: #ECFDFF;
+  
+  /* System Colors */
+  --color-success: #4DDB62;
+  --color-warning: #FFBF66;
+  --color-error: #E64F4F;
+  
+  /* Background Colors */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  --bg-dark: #111323;
+  --bg-card: #FFFFFF;
+  
+  /* Text Colors */
+  --text-primary: #111323;
+  --text-secondary: #6B7280;
+  --text-light: #9CA3AF;
+  --text-white: #FFFFFF;
+  --text-muted: #D1D5DB;
+  
+  /* Border Colors */
+  --border-light: #E5E7EB;
+  --border-medium: #D1D5DB;
+  --border-dark: #9CA3AF;
+  
+  /* Shadow */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* CSS Variables for Dark Mode */
+[data-theme="dark"] {
+  /* Background Colors */
+  --bg-primary: #111323;
+  --bg-secondary: #1a1f37;
+  --bg-tertiary: #252b45;
+  --bg-dark: #0a0d1a;
+  --bg-card: #1a1f37;
+  
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #D1D5DB;
+  --text-light: #9CA3AF;
+  --text-white: #FFFFFF;
+  --text-muted: #6B7280;
+  
+  /* Border Colors */
+  --border-light: #374151;
+  --border-medium: #4B5563;
+  --border-dark: #6B7280;
+  
+  /* Shadow (darker for dark mode) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Base styles */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
