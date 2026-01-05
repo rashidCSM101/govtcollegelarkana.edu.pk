@@ -98,21 +98,60 @@ class AdminController {
       const students = [];
       const fileContent = req.file.buffer.toString();
       
-      // Parse CSV
-      const lines = fileContent.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g, '_'));
+      // Parse CSV with proper quote handling
+      const lines = fileContent.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        return res.status(400).json({
+          success: false,
+          message: 'CSV file is empty or invalid'
+        });
+      }
+
+      // Parse headers - remove asterisks and normalize
+      const headerLine = lines[0];
+      const headers = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let char of headerLine) {
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          headers.push(current.trim().replace(/"/g, '').replace(/\*/g, '').replace(/\(.*?\)/g, '').toLowerCase().replace(/\s+/g, '_'));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      headers.push(current.trim().replace(/"/g, '').replace(/\*/g, '').replace(/\(.*?\)/g, '').toLowerCase().replace(/\s+/g, '_'));
       
+      // Parse data rows
       for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
         
-        const values = lines[i].split(',').map(v => v.trim());
-        const student = {};
-        
-        headers.forEach((header, index) => {
-          student[header] = values[index] || null;
-        });
-        
-        students.push(student);
+        const values = [];
+        current = '';
+        inQuotes = false;
+
+        for (let char of lines[i]) {
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim().replace(/^"|"$/g, ''));
+
+        if (values.length === headers.length) {
+          const student = {};
+          headers.forEach((header, index) => {
+            student[header] = values[index] || null;
+          });
+          students.push(student);
+        }
       }
 
       const result = await adminService.bulkUploadStudents(students, req.user.userId);

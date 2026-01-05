@@ -9,8 +9,8 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static folder for uploads
 app.use('/uploads', express.static('uploads'));
@@ -22,6 +22,26 @@ app.get('/', (req, res) => {
     message: 'Government College Larkana API is running',
     version: '1.0.0',
     timestamp: new Date().toISOString()
+  });
+});
+
+// API Welcome Route
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to Government College Larkana API',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth (login, register)',
+      admin: '/api/admin (dashboard, students, teachers, fees, etc.)',
+      student: '/api/student (dashboard, attendance, results, fees, etc.)',
+      teacher: '/api/teacher (dashboard, attendance, assignments, etc.)',
+      admission: '/api/admission (apply, merit-list, status)',
+      calendar: '/api/calendar (events, academic calendar)',
+      notices: '/api/notices (announcements)',
+      public: '/api/public (public information)'
+    },
+    documentation: 'Contact admin for API documentation'
   });
 });
 

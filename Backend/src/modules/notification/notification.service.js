@@ -688,8 +688,9 @@ class NotificationService {
   async deleteOldNotifications(daysOld = 90) {
     const result = await pool.query(
       `DELETE FROM notifications 
-       WHERE created_at < NOW() - INTERVAL '${daysOld} days'
-       RETURNING COUNT(*) as count`
+       WHERE created_at < NOW() - INTERVAL '1 day' * $1
+       RETURNING COUNT(*) as count`,
+      [daysOld]
     );
 
     return {

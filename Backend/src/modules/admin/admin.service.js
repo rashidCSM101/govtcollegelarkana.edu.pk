@@ -12,7 +12,7 @@ class AdminService {
 
   // Add new student
   async addStudent(studentData, createdBy) {
-    const { email, name, roll_no, father_name, dob, cnic, phone, address, batch, department_id, semester } = studentData;
+    const { email, name, roll_no, father_name, dob, cnic, phone, address, batch, department_id, semester, profile_photo, gender, blood_group, emergency_contact, father_phone, father_cnic, admission_date } = studentData;
 
     // Validate required fields
     const validation = validateRequired({ email, name }, ['email', 'name']);
@@ -38,6 +38,25 @@ class AdminService {
       }
     }
 
+    // Handle photo upload if base64
+    let photoFilename = null;
+    if (profile_photo && profile_photo.startsWith('data:image')) {
+      const fs = require('fs');
+      const path = require('path');
+      const base64Data = profile_photo.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const filename = `student-${Date.now()}.jpg`;
+      const uploadsDir = path.join(__dirname, '../../../uploads');
+      
+      // Create uploads directory if it doesn't exist
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      fs.writeFileSync(path.join(uploadsDir, filename), buffer);
+      photoFilename = filename;
+    }
+
     const client = await getClient();
 
     try {
@@ -59,10 +78,10 @@ class AdminService {
 
       // Create student profile
       const studentResult = await client.query(
-        `INSERT INTO students (user_id, roll_no, name, father_name, dob, cnic, phone, address, batch, department_id, semester, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active')
+        `INSERT INTO students (user_id, roll_no, name, father_name, father_phone, father_cnic, dob, date_of_birth, cnic, phone, emergency_contact, address, batch, department_id, semester, status, gender, blood_group, admission_date, profile_photo)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 'active', $16, $17, $18, $19)
          RETURNING *`,
-        [userId, roll_no || generateUniqueId('STU-'), name, father_name, dob, cnic, phone, address, batch, department_id, semester || 1]
+        [userId, roll_no || generateUniqueId('STU-'), name, father_name, father_phone, father_cnic, dob || admission_date, dob || admission_date, cnic, phone, emergency_contact, address, batch, department_id, semester || 1, gender, blood_group, admission_date, photoFilename]
       );
 
       // Create notification preferences
@@ -184,10 +203,14 @@ class AdminService {
 
   // Update student
   async updateStudent(studentId, updateData, updatedBy) {
-    const { name, father_name, dob, cnic, phone, address, batch, department_id, semester, status, roll_no } = updateData;
+    const { 
+      name, father_name, father_phone, father_cnic, dob, date_of_birth, cnic, phone, 
+      emergency_contact, address, batch, department_id, semester, status, roll_no, 
+      gender, blood_group, admission_date, profile_photo 
+    } = updateData;
 
     // Check if student exists
-    const existingStudent = await query('SELECT id, user_id FROM students WHERE id = $1', [studentId]);
+    const existingStudent = await query('SELECT id, user_id, profile_photo FROM students WHERE id = $1', [studentId]);
     if (existingStudent.rows.length === 0) {
       throw { status: 404, message: 'Student not found' };
     }
@@ -200,23 +223,66 @@ class AdminService {
       }
     }
 
+    // Handle photo upload if base64
+    let photoFilename = existingStudent.rows[0].profile_photo;
+    if (profile_photo && profile_photo.startsWith('data:image')) {
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Delete old photo if exists
+      if (photoFilename) {
+        const oldPhotoPath = path.join(__dirname, '../../../uploads', photoFilename);
+        if (fs.existsSync(oldPhotoPath)) {
+          fs.unlinkSync(oldPhotoPath);
+        }
+      }
+      
+      // Save new photo
+      const base64Data = profile_photo.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const filename = `student-${Date.now()}.jpg`;
+      const uploadsDir = path.join(__dirname, '../../../uploads');
+      
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      fs.writeFileSync(path.join(uploadsDir, filename), buffer);
+      photoFilename = filename;
+    }
+
     const result = await query(
       `UPDATE students SET
        name = COALESCE($1, name),
        father_name = COALESCE($2, father_name),
-       dob = COALESCE($3, dob),
-       cnic = COALESCE($4, cnic),
-       phone = COALESCE($5, phone),
-       address = COALESCE($6, address),
-       batch = COALESCE($7, batch),
-       department_id = COALESCE($8, department_id),
-       semester = COALESCE($9, semester),
-       status = COALESCE($10, status),
-       roll_no = COALESCE($11, roll_no),
+       father_phone = COALESCE($3, father_phone),
+       father_cnic = COALESCE($4, father_cnic),
+       dob = COALESCE($5, dob),
+       date_of_birth = COALESCE($6, date_of_birth),
+       cnic = COALESCE($7, cnic),
+       phone = COALESCE($8, phone),
+       emergency_contact = COALESCE($9, emergency_contact),
+       address = COALESCE($10, address),
+       batch = COALESCE($11, batch),
+       department_id = COALESCE($12, department_id),
+       semester = COALESCE($13, semester),
+       status = COALESCE($14, status),
+       roll_no = COALESCE($15, roll_no),
+       gender = COALESCE($16, gender),
+       blood_group = COALESCE($17, blood_group),
+       admission_date = COALESCE($18, admission_date),
+       profile_photo = COALESCE($19, profile_photo),
        updated_at = NOW()
-       WHERE id = $12
+       WHERE id = $20
        RETURNING *`,
-      [name, father_name, dob, cnic, phone, address, batch, department_id, semester, status, roll_no, studentId]
+      [
+        name, father_name, father_phone, father_cnic, 
+        dob || date_of_birth, dob || date_of_birth, 
+        cnic, phone, emergency_contact, address, batch, 
+        department_id, semester, status, roll_no, 
+        gender, blood_group, admission_date, photoFilename, 
+        studentId
+      ]
     );
 
     await this.logActivity(updatedBy, 'UPDATE_STUDENT', 'admin', { studentId, changes: updateData });
@@ -256,6 +322,11 @@ class AdminService {
 
     for (const student of studentsData) {
       try {
+        // Handle both name and first_name/last_name combinations
+        if (!student.name && student.first_name) {
+          student.name = `${student.first_name} ${student.last_name || ''}`.trim();
+        }
+        
         const result = await this.addStudent(student, createdBy);
         results.success.push({
           email: student.email,
@@ -265,7 +336,7 @@ class AdminService {
       } catch (error) {
         results.failed.push({
           email: student.email,
-          name: student.name,
+          name: student.name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Unknown',
           error: error.message
         });
       }

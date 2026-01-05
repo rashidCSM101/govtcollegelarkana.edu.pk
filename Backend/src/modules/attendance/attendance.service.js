@@ -822,6 +822,9 @@ class AttendanceService {
     const { semester_id, department_id, course_id, days = 30 } = filters;
 
     // Daily attendance trend
+    const params = [parseInt(days)];
+    let paramCount = 1;
+    
     let trendSql = `
       SELECT 
         a.date,
@@ -834,10 +837,8 @@ class AttendanceService {
       FROM attendance a
       JOIN course_sections cs ON a.section_id = cs.id
       JOIN courses c ON cs.course_id = c.id
-      WHERE a.date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'
+      WHERE a.date >= CURRENT_DATE - INTERVAL '1 day' * $1
     `;
-    const params = [];
-    let paramCount = 0;
 
     if (semester_id) {
       paramCount++;
@@ -873,18 +874,18 @@ class AttendanceService {
       FROM attendance a
       JOIN course_sections cs ON a.section_id = cs.id
       JOIN courses c ON cs.course_id = c.id
-      WHERE a.date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'
+      WHERE a.date >= CURRENT_DATE - INTERVAL '1 day' * $1
     `;
 
     if (semester_id) {
-      dayWiseSql += ` AND cs.semester_id = $1`;
+      dayWiseSql += ` AND cs.semester_id = $2`;
     }
     if (department_id) {
-      const idx = semester_id ? 2 : 1;
+      const idx = semester_id ? 3 : 2;
       dayWiseSql += ` AND c.department_id = $${idx}`;
     }
     if (course_id) {
-      const idx = (semester_id ? 1 : 0) + (department_id ? 1 : 0) + 1;
+      const idx = 2 + (semester_id ? 1 : 0) + (department_id ? 1 : 0);
       dayWiseSql += ` AND cs.course_id = $${idx}`;
     }
 
@@ -905,18 +906,18 @@ class AttendanceService {
       FROM attendance a
       JOIN course_sections cs ON a.section_id = cs.id
       JOIN courses c ON cs.course_id = c.id
-      WHERE a.date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'
+      WHERE a.date >= CURRENT_DATE - INTERVAL '1 day' * $1
     `;
 
     if (semester_id) {
-      overallSql += ` AND cs.semester_id = $1`;
+      overallSql += ` AND cs.semester_id = $2`;
     }
     if (department_id) {
-      const idx = semester_id ? 2 : 1;
+      const idx = semester_id ? 3 : 2;
       overallSql += ` AND c.department_id = $${idx}`;
     }
     if (course_id) {
-      const idx = (semester_id ? 1 : 0) + (department_id ? 1 : 0) + 1;
+      const idx = 2 + (semester_id ? 1 : 0) + (department_id ? 1 : 0);
       overallSql += ` AND cs.course_id = $${idx}`;
     }
 

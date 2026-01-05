@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const admissionController = require('./admission.controller');
-const { authenticate, authorize } = require('../../middleware/auth');
+const { authMiddleware } = require('../../middleware/auth.middleware');
+const { adminOnly } = require('../../middleware/role.middleware');
 
 // ==================== PUBLIC ROUTES ====================
 
@@ -22,40 +23,40 @@ router.get('/letter/:applicationNo', admissionController.generateAdmissionLetter
 // Get all applications
 router.get(
   '/applications',
-  authenticate,
-  authorize(['admin', 'super_admin']),
+  authMiddleware,
+  adminOnly,
   admissionController.getApplications
 );
 
 // Review application
 router.post(
   '/applications/:id/review',
-  authenticate,
-  authorize(['admin', 'super_admin']),
+  authMiddleware,
+  adminOnly,
   admissionController.reviewApplication
 );
 
 // Generate merit list
 router.post(
   '/merit-list/generate',
-  authenticate,
-  authorize(['admin', 'super_admin']),
+  authMiddleware,
+  adminOnly,
   admissionController.generateMeritList
 );
 
 // Approve admission (final step)
 router.post(
   '/applications/:id/approve',
-  authenticate,
-  authorize(['admin', 'super_admin']),
+  authMiddleware,
+  adminOnly,
   admissionController.approveAdmission
 );
 
 // Get admission statistics
 router.get(
   '/statistics',
-  authenticate,
-  authorize(['admin', 'super_admin']),
+  authMiddleware,
+  adminOnly,
   admissionController.getStatistics
 );
 
