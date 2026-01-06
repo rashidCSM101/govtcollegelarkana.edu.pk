@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getStudents, deleteStudent } from '../../../services/student.service';
+import { getStudents, deleteStudent, toggleStudentStatus, getStudentStatistics } from '../../../services/student.service';
+import { getDepartments } from '../../../services/department.service';
 import {
   useReactTable,
   getCoreRowModel,
@@ -20,7 +21,11 @@ import {
   Typography,
   message,
   Modal,
-  Select
+  Select,
+  Row,
+  Col,
+  Statistic,
+  Switch
 } from 'antd';
 import {
   PlusOutlined,
@@ -33,7 +38,11 @@ import {
   MoreOutlined,
   HomeOutlined,
   ArrowUpOutlined,
-  ArrowDownOutlined
+  ArrowDownOutlined,
+  UserOutlined,
+  ManOutlined,
+  WomanOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 
 const { Title } = Typography;
@@ -46,12 +55,47 @@ const AllStudents = () => {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [departments, setDepartments] = useState([]);
+  const [statistics, setStatistics] = useState(null);
+  const [showStatistics, setShowStatistics] = useState(false);
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    department_id: null,
+    semester: null,
+    batch: null,
+    status: null
+  });
+  
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadDepartments();
+    loadStatistics();
+  }, []);
 
   useEffect(() => {
     loadStudents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageIndex, pageSize, searchText]);
+  }, [pageIndex, pageSize, searchText, filters]);
+
+  const loadDepartments = async () => {
+    try {
+      const response = await getDepartments();
+      setDepartments(response.data || []);
+    } catch (error) {
+      console.error('Failed to load departments');
+    }
+  };
+
+  const loadStatistics = async () => {
+    try {
+      const response = await getStudentStatistics();
+      setStatistics(response.data || null);
+    } catch (error) {
+      console.error('Failed to load statistics');
+    }
+  };
 
   const loadStudents = async () => {
     try {
@@ -60,6 +104,7 @@ const AllStudents = () => {
         page: pageIndex + 1,
         limit: pageSize,
         search: searchText,
+        ...filters,
       });
       setStudents(response.data || []);
       setTotalRecords(response.pagination?.totalRecords || 0);
@@ -82,11 +127,24 @@ const AllStudents = () => {
           await deleteStudent(id);
           message.success('Student deleted successfully');
           loadStudents();
+          loadStatistics();
         } catch (error) {
           message.error(error.message || 'Failed to delete student');
         }
       },
     });
+  };
+
+  const handleToggleStatus = async (id, name, currentStatus) => {
+    try {
+      await toggleStudentStatus(id);
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      message.success(`${name}'s status changed to ${newStatus}`);
+      loadStudents();
+      loadStatistics();
+    } catch (error) {
+      message.error(error.message || 'Failed to toggle status');
+    }
   };
 
   const handleExport = async () => {
@@ -179,10 +237,15 @@ const AllStudents = () => {
       {
         accessorKey: 'status',
         header: 'Status',
-        cell: info => (
-          <Tag color={info.getValue() === 'active' ? 'success' : 'error'}>
-            {info.getValue()?.toUpperCase()}
-          </Tag>
+        cell: ({ row }) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Switch
+              checked={row.original.status === 'active'}
+              onChange={() => handleToggleStatus(row.original.id, row.original.name, row.original.status)}
+              checkedChildren="Active"
+              unCheckedChildren="Inactive"
+            />
+          </div>
         ),
       },
       {
@@ -258,6 +321,12 @@ const AllStudents = () => {
           <p className="text-[var(--text-secondary)] mt-1">Manage your students</p>
         </div>
         <Space>
+          <Button 
+            icon={<TeamOutlined />} 
+            onClick={() => setShowStatistics(!showStatistics)}
+          >
+            {showStatistics ? 'Hide' : 'Show'} Statistics
+          </Button>
           <Link to="/admin/students/bulk-upload">
             <Button icon={<DownloadOutlined />}>Bulk Upload</Button>
           </Link>
@@ -269,19 +338,146 @@ const AllStudents = () => {
         </Space>
       </div>
 
+      {/* Statistics Cards */}
+      {showStatistics && statistics && (
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Students"
+                value={statistics.overview?.total_students || 0}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#1890ff' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Active Students"
+                value={statistics.overview?.active_students || 0}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#52c41a' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Male Students"
+                value={statistics.overview?.male_students || 0}
+                prefix={<ManOutlined />}
+                valueStyle={{ color: '#1890ff' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Female Students"
+                value={statistics.overview?.female_students || 0}
+                prefix={<WomanOutlined />}
+                valueStyle={{ color: '#eb2f96' }}
+              />
+            </Card>
+          </Col>
+        </Row>
+      )}
+
       {/* Filters Card */}
       <Card>
-        <div className="flex gap-4">
-          <Input
-            placeholder="Search students..."
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 300 }}
-          />
-          <Button icon={<FilterOutlined />}>Filters</Button>
-          <Button icon={<DownloadOutlined />} onClick={handleExport} loading={loading}>Export</Button>
-        </div>
+        <Row gutter={[12, 12]} align="middle">
+          <Col xs={24} sm={12} lg={6}>
+            <Input
+              placeholder="Search students..."
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={4}>
+            <Select
+              placeholder="Department"
+              value={filters.department_id}
+              onChange={(value) => {
+                setFilters({ ...filters, department_id: value });
+                setPageIndex(0);
+              }}
+              style={{ width: '100%' }}
+              allowClear
+            >
+              {departments.map(dept => (
+                <Select.Option key={dept.id} value={dept.id}>
+                  {dept.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={24} sm={12} lg={3}>
+            <Select
+              placeholder="Semester"
+              value={filters.semester}
+              onChange={(value) => {
+                setFilters({ ...filters, semester: value });
+                setPageIndex(0);
+              }}
+              style={{ width: '100%' }}
+              allowClear
+            >
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                <Select.Option key={sem} value={sem}>
+                  Semester {sem}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={24} sm={12} lg={3}>
+            <Select
+              placeholder="Batch"
+              value={filters.batch}
+              onChange={(value) => {
+                setFilters({ ...filters, batch: value });
+                setPageIndex(0);
+              }}
+              style={{ width: '100%' }}
+              allowClear
+            >
+              {['2024', '2023', '2022', '2021', '2020', '2019'].map(batch => (
+                <Select.Option key={batch} value={batch}>
+                  {batch}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={24} sm={12} lg={3}>
+            <Select
+              placeholder="Status"
+              value={filters.status}
+              onChange={(value) => {
+                setFilters({ ...filters, status: value });
+                setPageIndex(0);
+              }}
+              style={{ width: '100%' }}
+              allowClear
+            >
+              <Select.Option value="active">Active</Select.Option>
+              <Select.Option value="inactive">Inactive</Select.Option>
+              <Select.Option value="graduated">Graduated</Select.Option>
+              <Select.Option value="suspended">Suspended</Select.Option>
+            </Select>
+          </Col>
+          <Col xs={24} sm={12} lg={5} className="flex justify-end">
+            <Button 
+              icon={<DownloadOutlined />} 
+              onClick={handleExport} 
+              loading={loading}
+              block
+            >
+              Export
+            </Button>
+          </Col>
+        </Row>
       </Card>
 
       {/* Students Table */}

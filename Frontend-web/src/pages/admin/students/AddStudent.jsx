@@ -300,40 +300,134 @@ const AddStudent = () => {
             </Col>
           </Row>
 
-          <Title level={4} className="!mt-6">Documents</Title>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Profile Photo"
-                name="photo"
-              >
-                <Upload 
-                  maxCount={1} 
-                  listType="picture-card"
-                  beforeUpload={(file) => {
-                    setPhotoFile(file);
-                    return false; // Prevent auto upload
-                  }}
-                  onRemove={() => setPhotoFile(null)}
-                >
-                  <div>
-                    <UploadOutlined />
-                    <div style={{ marginTop: 8 }}>Upload</div>
+          {/* Modern Document Upload Section */}
+          <div className="mt-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                <UploadOutlined className="text-white text-lg" />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-800 m-0">Upload Files</h4>
+                <p className="text-sm text-gray-500 m-0">Add profile photo and documents</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Profile Photo Card */}
+              <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-blue-200 bg-gradient-to-br from-blue-50/50 to-cyan-50/50 hover:border-blue-400 hover:shadow-lg transition-all duration-300 group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-cyan-400/10 rounded-full -ml-12 -mb-12"></div>
+                
+                <div className="relative p-6">
+                  {/* Card Header */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      <UploadOutlined className="text-white text-xl" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-gray-800 text-base m-0">Profile Photo</h5>
+                      <p className="text-xs text-gray-500 m-0">Student's profile picture</p>
+                    </div>
                   </div>
-                </Upload>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Documents"
-                name="documents"
-              >
-                <Upload multiple>
-                  <Button icon={<UploadOutlined />}>Upload Documents</Button>
-                </Upload>
-              </Form.Item>
-            </Col>
-          </Row>
+
+                  {/* Upload Area */}
+                  <Form.Item name="photo" className="mb-0">
+                    <Upload 
+                      maxCount={1} 
+                      listType="picture-card"
+                      className="profile-upload-modern"
+                      beforeUpload={(file) => {
+                        const isLt1M = file.size / 1024 / 1024 < 1;
+                        if (!isLt1M) {
+                          message.error('Image must be smaller than 1MB!');
+                          return Upload.LIST_IGNORE;
+                        }
+                        setPhotoFile(file);
+                        return false;
+                      }}
+                      onRemove={() => setPhotoFile(null)}
+                    >
+                      <div className="flex flex-col items-center py-4">
+                        <div className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center mb-3 group-hover:shadow-lg transition-shadow">
+                          <UploadOutlined className="text-2xl text-blue-500" />
+                        </div>
+                        <span className="font-medium text-gray-700">Click to upload</span>
+                        <span className="text-xs text-gray-400 mt-1">PNG, JPG • Max 1MB</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+
+                  {/* Bottom Tags */}
+                  <div className="flex gap-2 mt-4">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-100/80 text-blue-700 text-xs font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+                      1MB Max
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-100/80 text-blue-700 text-xs font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+                      Single File
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Documents Card */}
+              <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 hover:border-emerald-400 hover:shadow-lg transition-all duration-300 group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-400/10 rounded-full -ml-12 -mb-12"></div>
+                
+                <div className="relative p-6">
+                  {/* Card Header */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      <UploadOutlined className="text-white text-xl" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-gray-800 text-base m-0">Documents</h5>
+                      <p className="text-xs text-gray-500 m-0">Certificates, IDs & more</p>
+                    </div>
+                  </div>
+
+                  {/* Upload Area */}
+                  <Form.Item name="documents" className="mb-0">
+                    <Upload 
+                      multiple 
+                      listType="picture-card"
+                      className="docs-upload-modern"
+                      beforeUpload={(file) => {
+                        const isLt1M = file.size / 1024 / 1024 < 1;
+                        if (!isLt1M) {
+                          message.error('File must be smaller than 1MB!');
+                          return Upload.LIST_IGNORE;
+                        }
+                        return false;
+                      }}
+                    >
+                      <div className="flex flex-col items-center py-4">
+                        <div className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center mb-3 group-hover:shadow-lg transition-shadow">
+                          <UploadOutlined className="text-2xl text-emerald-500" />
+                        </div>
+                        <span className="font-medium text-gray-700">Click to upload</span>
+                        <span className="text-xs text-gray-400 mt-1">PDF, PNG, JPG • Max 1MB</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+
+                  {/* Bottom Tags */}
+                  <div className="flex gap-2 mt-4">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-100/80 text-emerald-700 text-xs font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                      1MB Each
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-100/80 text-emerald-700 text-xs font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                      Multiple Files
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <Form.Item className="!mt-6">
             <Space>

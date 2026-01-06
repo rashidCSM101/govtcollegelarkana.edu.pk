@@ -1,5 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 // Layouts
@@ -29,6 +28,9 @@ import BulkUploadStudents from '../pages/admin/students/BulkUploadStudents';
 
 // Admin - Teacher Management
 import AllTeachers from '../pages/admin/teachers/AllTeachers';
+import AddTeacher from '../pages/admin/teachers/AddTeacher';
+import EditTeacher from '../pages/admin/teachers/EditTeacher';
+import TeacherDetails from '../pages/admin/teachers/TeacherDetails';
 
 // Admin - Academics
 import Departments from '../pages/admin/academics/Departments';
@@ -51,8 +53,6 @@ import Reports from '../pages/admin/reports/Reports';
 import Settings from '../pages/admin/settings/Settings';
 
 const AppRoutes = () => {
-  const { isAuthenticated, user } = useAuth();
-
   return (
     <Routes>
       {/* Public Routes */}
@@ -98,6 +98,9 @@ const AppRoutes = () => {
         
         {/* Teacher Management */}
         <Route path="teachers" element={<AllTeachers />} />
+        <Route path="teachers/add" element={<AddTeacher />} />
+        <Route path="teachers/edit/:id" element={<EditTeacher />} />
+        <Route path="teachers/:id" element={<TeacherDetails />} />
         
         {/* Academics */}
         <Route path="departments" element={<Departments />} />

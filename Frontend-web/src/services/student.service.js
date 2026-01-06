@@ -35,6 +35,16 @@ export const deleteStudent = async (id, permanent = false) => {
   return await api.delete(`/admin/students/${id}?permanent=${permanent}`);
 };
 
+// Toggle student status
+export const toggleStudentStatus = async (id) => {
+  return await api.patch(`/admin/students/${id}/toggle-status`);
+};
+
+// Get student statistics
+export const getStudentStatistics = async () => {
+  return await api.get('/admin/students/statistics');
+};
+
 // Search students
 export const searchStudents = async (query) => {
   return await api.get(`/admin/students/search?q=${query}`);

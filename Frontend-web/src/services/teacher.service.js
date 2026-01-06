@@ -32,10 +32,22 @@ export const deleteTeacher = async (id) => {
   return await api.delete(`/admin/teachers/${id}`);
 };
 
+// Toggle teacher status
+export const toggleTeacherStatus = async (id) => {
+  return await api.patch(`/admin/teachers/${id}/toggle-status`);
+};
+
+// Get teacher statistics
+export const getTeacherStatistics = async () => {
+  return await api.get('/admin/teachers/statistics');
+};
+
 export default {
   getTeachers,
   getTeacherById,
   addTeacher,
   updateTeacher,
   deleteTeacher,
+  toggleTeacherStatus,
+  getTeacherStatistics,
 };

@@ -1,4 +1,6 @@
 const bcrypt = require('bcrypt');
+const path = require('path');
+const fs = require('fs');
 const { query, getClient } = require('../../config/database');
 const { generatePassword, generateUniqueId, paginate, paginationResponse } = require('../../utils/helper');
 const { isValidEmail, isValidCNIC, isValidPhone, validateRequired } = require('../../utils/validator');
@@ -290,6 +292,87 @@ class AdminService {
     return result.rows[0];
   }
 
+  // Toggle student status (active/inactive)
+  async toggleStudentStatus(studentId, updatedBy) {
+    const existingStudent = await query('SELECT id, status FROM students WHERE id = $1', [studentId]);
+    if (existingStudent.rows.length === 0) {
+      throw { status: 404, message: 'Student not found' };
+    }
+
+    const currentStatus = existingStudent.rows[0].status;
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+
+    const result = await query(
+      `UPDATE students SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [newStatus, studentId]
+    );
+
+    await this.logActivity(updatedBy, 'TOGGLE_STUDENT_STATUS', 'admin', { studentId, oldStatus: currentStatus, newStatus });
+
+    return result.rows[0];
+  }
+
+  // Get student statistics
+  async getStudentStatistics() {
+    const result = await query(`
+      SELECT 
+        COUNT(*) as total_students,
+        COUNT(CASE WHEN status = 'active' THEN 1 END) as active_students,
+        COUNT(CASE WHEN status = 'inactive' THEN 1 END) as inactive_students,
+        COUNT(CASE WHEN status = 'graduated' THEN 1 END) as graduated_students,
+        COUNT(CASE WHEN status = 'suspended' THEN 1 END) as suspended_students,
+        COUNT(CASE WHEN status = 'dropped' THEN 1 END) as dropped_students,
+        COUNT(CASE WHEN gender = 'Male' THEN 1 END) as male_students,
+        COUNT(CASE WHEN gender = 'Female' THEN 1 END) as female_students,
+        COUNT(CASE WHEN gender IS NULL OR gender = '' THEN 1 END) as gender_not_specified
+      FROM students
+    `);
+
+    const departmentStats = await query(`
+      SELECT 
+        d.name as department_name,
+        d.code as department_code,
+        COUNT(s.id) as student_count,
+        COUNT(CASE WHEN s.gender = 'Male' THEN 1 END) as male_count,
+        COUNT(CASE WHEN s.gender = 'Female' THEN 1 END) as female_count
+      FROM departments d
+      LEFT JOIN students s ON d.id = s.department_id AND s.status = 'active'
+      GROUP BY d.id, d.name, d.code
+      ORDER BY student_count DESC
+    `);
+
+    const semesterStats = await query(`
+      SELECT 
+        semester,
+        COUNT(*) as student_count,
+        COUNT(CASE WHEN gender = 'Male' THEN 1 END) as male_count,
+        COUNT(CASE WHEN gender = 'Female' THEN 1 END) as female_count
+      FROM students
+      WHERE status = 'active' AND semester IS NOT NULL
+      GROUP BY semester
+      ORDER BY semester
+    `);
+
+    const batchStats = await query(`
+      SELECT 
+        batch,
+        COUNT(*) as student_count,
+        COUNT(CASE WHEN gender = 'Male' THEN 1 END) as male_count,
+        COUNT(CASE WHEN gender = 'Female' THEN 1 END) as female_count
+      FROM students
+      WHERE status = 'active' AND batch IS NOT NULL
+      GROUP BY batch
+      ORDER BY batch DESC
+    `);
+
+    return {
+      overview: result.rows[0],
+      by_department: departmentStats.rows,
+      by_semester: semesterStats.rows,
+      by_batch: batchStats.rows
+    };
+  }
+
   // Delete/Deactivate student
   async deleteStudent(studentId, deletedBy, permanent = false) {
     const existingStudent = await query('SELECT id, user_id, name FROM students WHERE id = $1', [studentId]);
@@ -372,7 +455,7 @@ class AdminService {
 
   // Add new teacher
   async addTeacher(teacherData, createdBy) {
-    const { email, name, cnic, phone, designation, department_id, qualification, specialization, experience } = teacherData;
+    const { email, name, cnic, phone, designation, department_id, qualification, specialization, experience, gender, address, photo } = teacherData;
 
     const validation = validateRequired({ email, name }, ['email', 'name']);
     if (!validation.isValid) {
@@ -393,6 +476,23 @@ class AdminService {
     try {
       await client.query('BEGIN');
 
+      // Handle photo upload if base64
+      let photoFilename = null;
+      if (photo && photo.startsWith('data:image')) {
+        const uploadDir = path.join(__dirname, '../../../uploads');
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const base64Data = photo.replace(/^data:image\/\w+;base64,/, '');
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        const filename = `teacher-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+        const filePath = path.join(uploadDir, filename);
+
+        fs.writeFileSync(filePath, imageBuffer);
+        photoFilename = filename;
+      }
+
       const tempPassword = generatePassword(10);
       const hashedPassword = await bcrypt.hash(tempPassword, SALT_ROUNDS);
 
@@ -406,10 +506,10 @@ class AdminService {
       const userId = userResult.rows[0].id;
 
       const teacherResult = await client.query(
-        `INSERT INTO teachers (user_id, name, cnic, phone, designation, department_id, qualification, specialization, experience, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active')
+        `INSERT INTO teachers (user_id, name, cnic, phone, designation, department_id, qualification, specialization, experience, gender, address, photo, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'active')
          RETURNING *`,
-        [userId, name, cnic, phone, designation, department_id, qualification, specialization, experience || 0]
+        [userId, name, cnic, phone, designation, department_id, qualification, specialization, experience || 0, gender, address, photoFilename]
       );
 
       await client.query(
@@ -534,11 +634,36 @@ class AdminService {
 
   // Update teacher
   async updateTeacher(teacherId, updateData, updatedBy) {
-    const { name, cnic, phone, designation, department_id, qualification, specialization, experience, status } = updateData;
+    const { name, cnic, phone, designation, department_id, qualification, specialization, experience, status, gender, address, photo } = updateData;
 
-    const existingTeacher = await query('SELECT id FROM teachers WHERE id = $1', [teacherId]);
+    const existingTeacher = await query('SELECT id, photo FROM teachers WHERE id = $1', [teacherId]);
     if (existingTeacher.rows.length === 0) {
       throw { status: 404, message: 'Teacher not found' };
+    }
+
+    // Handle photo upload if base64
+    let photoFilename = existingTeacher.rows[0].photo;
+    if (photo && photo.startsWith('data:image')) {
+      const uploadDir = path.join(__dirname, '../../../uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      // Delete old photo if exists
+      if (photoFilename) {
+        const oldPhotoPath = path.join(__dirname, '../../../uploads', photoFilename);
+        if (fs.existsSync(oldPhotoPath)) {
+          fs.unlinkSync(oldPhotoPath);
+        }
+      }
+
+      const base64Data = photo.replace(/^data:image\/\w+;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+      const filename = `teacher-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      const filePath = path.join(uploadDir, filename);
+
+      fs.writeFileSync(filePath, imageBuffer);
+      photoFilename = filename;
     }
 
     const result = await query(
@@ -552,10 +677,13 @@ class AdminService {
        specialization = COALESCE($7, specialization),
        experience = COALESCE($8, experience),
        status = COALESCE($9, status),
+       gender = COALESCE($10, gender),
+       address = COALESCE($11, address),
+       photo = $12,
        updated_at = NOW()
-       WHERE id = $10
+       WHERE id = $13
        RETURNING *`,
-      [name, cnic, phone, designation, department_id, qualification, specialization, experience, status, teacherId]
+      [name, cnic, phone, designation, department_id, qualification, specialization, experience, status, gender, address, photoFilename, teacherId]
     );
 
     await this.logActivity(updatedBy, 'UPDATE_TEACHER', 'admin', { teacherId, changes: updateData });
@@ -582,6 +710,77 @@ class AdminService {
       await this.logActivity(deletedBy, 'DEACTIVATE_TEACHER', 'admin', { teacherId });
       return { message: 'Teacher deactivated successfully' };
     }
+  }
+
+  // Toggle teacher status
+  async toggleTeacherStatus(teacherId, updatedBy) {
+    const teacher = await query('SELECT id, user_id, status FROM teachers WHERE id = $1', [teacherId]);
+    if (teacher.rows.length === 0) {
+      throw { status: 404, message: 'Teacher not found' };
+    }
+
+    const currentStatus = teacher.rows[0].status;
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const isActive = newStatus === 'active';
+
+    await query('UPDATE teachers SET status = $1 WHERE id = $2', [newStatus, teacherId]);
+    await query('UPDATE users SET is_active = $1 WHERE id = $2', [isActive, teacher.rows[0].user_id]);
+
+    await this.logActivity(updatedBy, 'TOGGLE_TEACHER_STATUS', 'admin', { 
+      teacherId, 
+      oldStatus: currentStatus, 
+      newStatus 
+    });
+
+    const updatedTeacher = await query('SELECT * FROM teachers WHERE id = $1', [teacherId]);
+    return updatedTeacher.rows[0];
+  }
+
+  // Get teacher statistics
+  async getTeacherStatistics() {
+    // Overview statistics
+    const overview = await query(`
+      SELECT 
+        COUNT(*) as total_teachers,
+        COUNT(*) FILTER (WHERE status = 'active') as active_teachers,
+        COUNT(*) FILTER (WHERE status = 'inactive') as inactive_teachers,
+        COUNT(*) FILTER (WHERE gender = 'male') as male_teachers,
+        COUNT(*) FILTER (WHERE gender = 'female') as female_teachers
+      FROM teachers
+    `);
+
+    // Department-wise statistics
+    const byDepartment = await query(`
+      SELECT 
+        d.id,
+        d.name as department,
+        COUNT(t.id) as total,
+        COUNT(*) FILTER (WHERE t.gender = 'male') as male,
+        COUNT(*) FILTER (WHERE t.gender = 'female') as female
+      FROM departments d
+      LEFT JOIN teachers t ON d.id = t.department_id
+      GROUP BY d.id, d.name
+      ORDER BY d.name
+    `);
+
+    // Designation-wise statistics
+    const byDesignation = await query(`
+      SELECT 
+        designation,
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE gender = 'male') as male,
+        COUNT(*) FILTER (WHERE gender = 'female') as female
+      FROM teachers
+      WHERE designation IS NOT NULL
+      GROUP BY designation
+      ORDER BY total DESC
+    `);
+
+    return {
+      overview: overview.rows[0],
+      by_department: byDepartment.rows,
+      by_designation: byDesignation.rows
+    };
   }
 
   // Assign course to teacher

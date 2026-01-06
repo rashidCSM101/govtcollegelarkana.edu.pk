@@ -44,17 +44,21 @@ router.get('/dashboard', dashboardController.getAdminDashboard.bind(dashboardCon
 // ==================== STUDENT ROUTES ====================
 router.post('/students', adminController.addStudent);
 router.get('/students', adminController.getStudents);
+router.get('/students/statistics', adminController.getStudentStatistics);
 router.get('/students/search', adminController.searchStudents);
 router.post('/students/bulk-upload', upload.single('file'), adminController.bulkUploadStudents);
 router.get('/students/:id', adminController.getStudentById);
 router.put('/students/:id', adminController.updateStudent);
+router.patch('/students/:id/toggle-status', adminController.toggleStudentStatus);
 router.delete('/students/:id', adminController.deleteStudent);
 
 // ==================== TEACHER ROUTES ====================
 router.post('/teachers', adminController.addTeacher);
+router.get('/teachers/statistics', adminController.getTeacherStatistics);
 router.get('/teachers', adminController.getTeachers);
 router.get('/teachers/:id', adminController.getTeacherById);
 router.put('/teachers/:id', adminController.updateTeacher);
+router.patch('/teachers/:id/toggle-status', adminController.toggleTeacherStatus);
 router.delete('/teachers/:id', adminController.deleteTeacher);
 router.post('/teachers/:id/assign-course', adminController.assignCourseToTeacher);
 

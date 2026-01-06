@@ -71,6 +71,33 @@ class AdminController {
     }
   }
 
+  // Toggle student status
+  async toggleStudentStatus(req, res, next) {
+    try {
+      const student = await adminService.toggleStudentStatus(req.params.id, req.user.userId);
+      res.status(200).json({
+        success: true,
+        message: 'Student status updated successfully',
+        data: student
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get student statistics
+  async getStudentStatistics(req, res, next) {
+    try {
+      const statistics = await adminService.getStudentStatistics();
+      res.status(200).json({
+        success: true,
+        data: statistics
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // Delete student
   async deleteStudent(req, res, next) {
     try {
@@ -265,6 +292,33 @@ class AdminController {
       res.status(200).json({
         success: true,
         message: result.message
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Toggle teacher status
+  async toggleTeacherStatus(req, res, next) {
+    try {
+      const teacher = await adminService.toggleTeacherStatus(req.params.id, req.user.userId);
+      res.status(200).json({
+        success: true,
+        message: 'Teacher status updated successfully',
+        data: teacher
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get teacher statistics
+  async getTeacherStatistics(req, res, next) {
+    try {
+      const statistics = await adminService.getTeacherStatistics();
+      res.status(200).json({
+        success: true,
+        data: statistics
       });
     } catch (error) {
       next(error);
